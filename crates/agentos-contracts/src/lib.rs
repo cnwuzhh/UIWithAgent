@@ -26,7 +26,11 @@ pub struct SurfaceDto {
 }
 
 #[derive(Clone, Debug, Serialize)]
-#[serde(tag = "type", rename_all = "camelCase")]
+#[serde(
+    tag = "type",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
 pub enum ElementDto {
     TimePanel {
         id: String,
@@ -51,7 +55,11 @@ pub enum ElementDto {
 }
 
 #[derive(Clone, Debug, Serialize)]
-#[serde(tag = "type", rename_all = "camelCase")]
+#[serde(
+    tag = "type",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
 pub enum TextRunDto {
     Text {
         content: String,
@@ -60,4 +68,47 @@ pub enum TextRunDto {
         label: String,
         target_surface_id: String,
     },
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{ElementDto, TextRunDto};
+    use serde_json::json;
+
+    #[test]
+    fn surface_targets_are_serialized_as_camel_case() {
+        let app_icon = ElementDto::AppIcon {
+            id: "work".into(),
+            title: "Work".into(),
+            icon: "briefcase".into(),
+            status: "ready".into(),
+            target_surface_id: "surface-work".into(),
+            column: 1,
+        };
+        let surface_link = TextRunDto::SurfaceLink {
+            label: "Work".into(),
+            target_surface_id: "surface-work".into(),
+        };
+
+        assert_eq!(
+            serde_json::to_value(app_icon).unwrap(),
+            json!({
+                "type": "appIcon",
+                "id": "work",
+                "title": "Work",
+                "icon": "briefcase",
+                "status": "ready",
+                "targetSurfaceId": "surface-work",
+                "column": 1
+            })
+        );
+        assert_eq!(
+            serde_json::to_value(surface_link).unwrap(),
+            json!({
+                "type": "surfaceLink",
+                "label": "Work",
+                "targetSurfaceId": "surface-work"
+            })
+        );
+    }
 }
