@@ -13,6 +13,7 @@ name = "agentos-application"
 version = "0.1.0"
 dependencies = [
  "agentos-contracts",
+ "agentos-domain",
 ]
 
 [[package]]
@@ -21,6 +22,10 @@ version = "0.1.0"
 dependencies = [
  "serde",
 ]
+
+[[package]]
+name = "agentos-domain"
+version = "0.1.0"
 
 [[package]]
 name = "aho-corasick"

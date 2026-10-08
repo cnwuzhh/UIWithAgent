@@ -5,3 +5,8 @@ export async function getRuntimeSnapshot(): Promise<RuntimeSnapshot> {
   const response = await invoke<unknown>("get_runtime_snapshot");
   return runtimeSnapshotSchema.parse(response);
 }
+
+export async function openSurface(surfaceId: string): Promise<RuntimeSnapshot> {
+  const response = await invoke<unknown>("open_surface", { surfaceId });
+  return runtimeSnapshotSchema.parse(response);
+}

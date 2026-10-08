@@ -14,6 +14,7 @@ const appIconSchema = z.object({
   title: z.string(),
   icon: z.string(),
   status: z.string(),
+  targetSurfaceId: z.string(),
   column: z.number(),
 });
 

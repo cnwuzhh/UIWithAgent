@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Bot, ChevronRight, Command, LayoutDashboard, Plus, Search } from "lucide-react";
 import type { RuntimeSnapshot } from "../contracts";
-import { getRuntimeSnapshot } from "../ipc/client";
+import { getRuntimeSnapshot, openSurface } from "../ipc/client";
 import { SurfaceView } from "../surface/SurfaceView";
 
 type LoadState =
@@ -21,6 +21,16 @@ export function App() {
       });
   }, []);
 
+  async function handleOpenSurface(surfaceId: string) {
+    if (state.status !== "ready") return;
+    try {
+      setState({ status: "ready", snapshot: await openSurface(surfaceId) });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "无法打开 Surface";
+      setState({ status: "failed", message });
+    }
+  }
+
   return (
     <main className="app-shell">
       <header className="titlebar">
@@ -31,16 +41,22 @@ export function App() {
       <nav className="breadcrumb" aria-label="当前位置">
         <LayoutDashboard size={17} />
         {state.status === "ready" ? state.snapshot.breadcrumb.map((item) => (
-          <span className="breadcrumb-item" key={item.surfaceId}>
+          <button
+            className="breadcrumb-item"
+            key={item.surfaceId}
+            onClick={() => handleOpenSurface(item.surfaceId)}
+          >
             <ChevronRight size={15} />{item.title}
-          </span>
+          </button>
         )) : <span className="breadcrumb-item"><ChevronRight size={15} />正在载入</span>}
         <button className="icon-button" title="搜索 Surface" aria-label="搜索 Surface"><Search size={18} /></button>
       </nav>
 
       {state.status === "loading" && <section className="status-page">正在连接 Runtime...</section>}
       {state.status === "failed" && <section className="status-page error">{state.message}</section>}
-      {state.status === "ready" && <SurfaceView surface={state.snapshot.surface} />}
+      {state.status === "ready" && (
+        <SurfaceView surface={state.snapshot.surface} onOpenSurface={handleOpenSurface} />
+      )}
 
       <aside className="agent-dock" aria-label="Agent 构建入口">
         <div className="agent-mark"><Bot size={22} /></div>

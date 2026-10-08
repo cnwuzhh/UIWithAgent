@@ -27,16 +27,27 @@ function TimePanel({ element }: { element: Extract<SurfaceElement, { type: "time
   );
 }
 
-function AppIcon({ element }: { element: Extract<SurfaceElement, { type: "appIcon" }> }) {
+function AppIcon({ element, onOpenSurface }: {
+  element: Extract<SurfaceElement, { type: "appIcon" }>;
+  onOpenSurface: (surfaceId: string) => void;
+}) {
   return (
-    <button className="app-icon" style={{ gridColumn: `${element.column} / span 2` }}>
+    <button
+      className="app-icon"
+      onDoubleClick={() => onOpenSurface(element.targetSurfaceId)}
+      onKeyDown={(event) => event.key === "Enter" && onOpenSurface(element.targetSurfaceId)}
+      style={{ gridColumn: `${element.column} / span 2` }}
+    >
       <span><BriefcaseBusiness size={25} /></span>
       <strong>{element.title}</strong>
     </button>
   );
 }
 
-export function SurfaceView({ surface }: { surface: RuntimeSnapshot["surface"] }) {
+export function SurfaceView({ surface, onOpenSurface }: {
+  surface: RuntimeSnapshot["surface"];
+  onOpenSurface: (surfaceId: string) => void;
+}) {
   return (
     <section className="surface">
       <div className="surface-heading">
@@ -46,7 +57,7 @@ export function SurfaceView({ surface }: { surface: RuntimeSnapshot["surface"] }
       <div className="surface-grid">
         {surface.elements.map((element) => element.type === "timePanel"
           ? <TimePanel element={element} key={element.id} />
-          : <AppIcon element={element} key={element.id} />)}
+          : <AppIcon element={element} key={element.id} onOpenSurface={onOpenSurface} />)}
       </div>
       <div className="navigator"><Search size={17} /><span>跳转到 Surface 或告诉 Agent 你要去哪里...</span><kbd>Enter</kbd></div>
     </section>

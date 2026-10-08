@@ -39,6 +39,7 @@ pub enum ElementDto {
         title: String,
         icon: String,
         status: String,
+        target_surface_id: String,
         column: u8,
     },
 }

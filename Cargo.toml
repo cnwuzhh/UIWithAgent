@@ -4,6 +4,7 @@ members = [
   "apps/desktop/src-tauri",
   "crates/agentos-application",
   "crates/agentos-contracts",
+  "crates/agentos-domain",
 ]
 
 [workspace.package]
@@ -15,6 +16,7 @@ version = "0.1.0"
 [workspace.dependencies]
 agentos-application = { path = "crates/agentos-application" }
 agentos-contracts = { path = "crates/agentos-contracts" }
+agentos-domain = { path = "crates/agentos-domain" }
 serde = { version = "1", features = ["derive"] }
 tauri = { version = "2", default-features = false, features = ["wry"] }
 tauri-build = { version = "2" }

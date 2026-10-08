@@ -15,7 +15,8 @@ button { font: inherit; }
 .system-state { color: #c9cec5; font-family: "Ubuntu Mono", monospace; font-size: 11px; font-weight: 400; }
 .system-state span { width: 7px; height: 7px; border-radius: 50%; background: #83c97b; box-shadow: 0 0 0 3px #83c97b22; }
 .breadcrumb { display: flex; align-items: center; gap: 4px; padding: 0 24px; border-bottom: 1px solid #cac8bf; background: #f4f2ec; }
-.breadcrumb-item { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; }
+.breadcrumb-item { display: flex; align-items: center; gap: 4px; padding: 6px 4px; border: 0; color: inherit; background: transparent; font-size: 13px; font-weight: 600; cursor: pointer; }
+.breadcrumb-item:hover, .breadcrumb-item:focus-visible { color: #2f6f62; outline: none; }
 .icon-button { margin-left: auto; width: 34px; height: 34px; display: grid; place-items: center; border: 0; background: transparent; color: #555a52; cursor: pointer; }
 .surface { margin: 22px 24px 96px; min-height: 560px; display: flex; flex-direction: column; border: 1px solid #bbb9af; background-color: #f7f5ef; background-image: linear-gradient(#d8d5ca55 1px, transparent 1px), linear-gradient(90deg, #d8d5ca55 1px, transparent 1px); background-size: 24px 24px; box-shadow: 0 12px 30px #34372f12; }
 .surface-heading { display: flex; align-items: end; justify-content: space-between; padding: 26px 30px 20px; border-bottom: 1px solid #c8c5ba; background: #f7f5eff2; }
