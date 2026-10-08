@@ -138,22 +138,22 @@ flowchart TB
 
 | 模块 | 所有权 | 主要职责 |
 | --- | --- | --- |
-| Shell | React | 窗口框架、顶部路径、工具栏、Dialog、通知 |
-| Surface Renderer | React | 12 列网格、Element 分发、选择与编辑预览 |
-| UI Projection Store | Zustand | Rust 快照的只读投影和瞬时 UI 状态 |
-| IPC Client | TypeScript | 类型化 Tauri commands 和事件订阅 |
-| GUI Domain | Rust | Surface、Element、BuildTask、Operation 等领域类型 |
-| Operation Engine | Rust | 预检、原子变更、逆操作和影响摘要 |
-| Validator | Rust | Schema、引用、树、几何和状态校验 |
-| Placement Engine | Rust | 网格吸附、碰撞、自动放置和扩展高度 |
-| Navigation Service | Rust | 父链路径、链接跳转、历史和路径解析 |
-| Build Orchestrator | Rust/Tokio | BuildTask、AgentSession、Worker、确认和取消 |
-| Agent System API | Rust | capability、scope、查询、预检、提交和审计 |
-| Model Gateway | Rust trait | Stub、远程模型或本地模型适配 |
-| Native Capability Service | Rust | 本地应用、portal、通知和 Secret Service |
-| Repository | Rust traits | 领域对象、Unit of Work 和 revision ports |
-| SQLite Adapter | SQLx | Schema migration、事务与领域对象映射 |
-| Observability | tracing | 结构化日志、correlation ID、诊断导出 |
+| [Shell](modules/01-shell.md) | React | 窗口框架、顶部路径、工具栏、Dialog、通知 |
+| [Surface Renderer](modules/02-surface-renderer.md) | React | 12 列网格、Element 分发、选择与编辑预览 |
+| [UI Projection Store](modules/03-ui-projection-store.md) | Zustand | Rust 快照的只读投影和瞬时 UI 状态 |
+| [IPC Client](modules/04-ipc-client.md) | TypeScript | 类型化 Tauri commands 和事件订阅 |
+| [GUI Domain](modules/05-gui-domain.md) | Rust | Surface、Element、BuildTask、Operation 等领域类型 |
+| [Operation Engine](modules/06-operation-engine.md) | Rust | 预检、原子变更、逆操作和影响摘要 |
+| [Validator](modules/07-validator.md) | Rust | Schema、引用、树、几何和状态校验 |
+| [Placement Engine](modules/08-placement-engine.md) | Rust | 网格吸附、碰撞、自动放置和扩展高度 |
+| [Navigation Service](modules/09-navigation-service.md) | Rust | 父链路径、链接跳转、历史和路径解析 |
+| [Build Orchestrator](modules/10-build-orchestrator.md) | Rust/Tokio | BuildTask、AgentSession、Worker、确认和取消 |
+| [Agent System API](modules/11-agent-system-api.md) | Rust | capability、scope、查询、预检、提交和审计 |
+| [Model Gateway](modules/12-model-gateway.md) | Rust trait | Stub、远程模型或本地模型适配 |
+| [Native Capability Service](modules/13-native-capability-service.md) | Rust | 本地应用、portal、通知和 Secret Service |
+| [Repository](modules/14-repository.md) | Rust traits | 领域对象、Unit of Work 和 revision ports |
+| [SQLite Adapter](modules/15-sqlite-adapter.md) | SQLx | Schema migration、事务与领域对象映射 |
+| [Observability](modules/16-observability.md) | tracing | 结构化日志、correlation ID、诊断导出 |
 
 ## 6. 权威状态与状态边界
 

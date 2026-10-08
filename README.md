@@ -11,6 +11,8 @@ MVP 以二维 `Surface` 为基础，只包含两种内容元素：
 
 整体进程、模块、数据、安全与交付架构见 [AgentOS 总体架构](docs/AgentOS-总体架构.md)。产品与交互细节见 [AgentOS MVP 设计文档](docs/AgentOS-MVP设计文档.md)。
 
+16 个模块的职责、接口、状态、错误、安全与测试设计见 [模块设计索引](docs/modules/README.md)。
+
 Agent 只能通过受 capability 限制的系统 API 使用 Surface、构建任务和本地能力，不能直接访问 SQLite、Repository、文件系统或任意 Shell。完整协议见 [Agent System API](docs/Agent-System-API.md)。
 
 ## 产品原型
