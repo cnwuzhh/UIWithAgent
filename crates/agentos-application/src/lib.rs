@@ -2,7 +2,8 @@ use agentos_contracts::{
     BreadcrumbItemDto, ElementDto, GridRectDto, RuntimeSnapshotDto, SurfaceDto, TextRunDto,
 };
 use agentos_domain::{
-    AppIcon, Element, GridRect, GuiDocument, Surface, SurfaceId, TextPanel, TextRun, TimePanel,
+    AppIcon, Element, GridRect, GuiDocument, GuiOperation, OperationTransaction, Surface,
+    SurfaceId, TextPanel, TextRun, TimePanel,
 };
 
 pub struct Runtime {
@@ -128,6 +129,51 @@ impl Runtime {
             .document
             .resize_element(&surface_id, element_id, width, height)
             .map_err(|error| error.to_string())?;
+        self.snapshot_for(&self.current_surface_id)
+    }
+
+    pub fn add_time_panel(
+        &mut self,
+        surface_id: &str,
+        title: &str,
+        timezone: &str,
+    ) -> Result<RuntimeSnapshotDto, String> {
+        let surface_id = SurfaceId::new(surface_id).map_err(|error| error.to_string())?;
+        let element = Element::TimePanel(TimePanel {
+            id: format!("time-created-{}", self.document.revision()),
+            title: title.trim().into(),
+            timezone: timezone.trim().into(),
+            rect: rect(0, 0, 4, 1),
+        });
+        self.document = self
+            .document
+            .apply_transaction(&OperationTransaction {
+                operations: vec![GuiOperation::AddElementAuto {
+                    surface_id,
+                    element,
+                }],
+            })
+            .map_err(|error| error.to_string())?
+            .document;
+        self.snapshot_for(&self.current_surface_id)
+    }
+
+    pub fn remove_element(
+        &mut self,
+        surface_id: &str,
+        element_id: &str,
+    ) -> Result<RuntimeSnapshotDto, String> {
+        let surface_id = SurfaceId::new(surface_id).map_err(|error| error.to_string())?;
+        self.document = self
+            .document
+            .apply_transaction(&OperationTransaction {
+                operations: vec![GuiOperation::RemoveElement {
+                    surface_id,
+                    element_id: element_id.into(),
+                }],
+            })
+            .map_err(|error| error.to_string())?
+            .document;
         self.snapshot_for(&self.current_surface_id)
     }
 
@@ -348,5 +394,38 @@ mod tests {
             })
             .unwrap();
         assert_eq!((rect.width, rect.height), (2, 2));
+    }
+
+    #[test]
+    fn add_and_remove_time_panel_return_authoritative_snapshots() {
+        let mut runtime = Runtime::demo();
+        let added = runtime
+            .add_time_panel("surface-desktop", "东京", "Asia/Tokyo")
+            .unwrap();
+        let id = added
+            .surface
+            .elements
+            .iter()
+            .find_map(|element| match element {
+                agentos_contracts::ElementDto::TimePanel { id, title, .. } if title == "东京" => {
+                    Some(id.clone())
+                }
+                _ => None,
+            })
+            .unwrap();
+
+        assert_eq!(added.revision, 2);
+        let removed = runtime.remove_element("surface-desktop", &id).unwrap();
+        assert_eq!(removed.revision, 3);
+        assert!(
+            !removed
+                .surface
+                .elements
+                .iter()
+                .any(|element| match element {
+                    agentos_contracts::ElementDto::TimePanel { id: current, .. } => current == &id,
+                    _ => false,
+                })
+        );
     }
 }

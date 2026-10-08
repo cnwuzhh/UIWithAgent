@@ -31,6 +31,20 @@ export async function resizeElement(
   return runtimeSnapshotSchema.parse(response);
 }
 
+export async function addTimePanel(
+  surfaceId: string,
+  title: string,
+  timezone: string,
+): Promise<RuntimeSnapshot> {
+  const response = await invoke<unknown>("add_time_panel", { surfaceId, title, timezone });
+  return runtimeSnapshotSchema.parse(response);
+}
+
+export async function removeElement(surfaceId: string, elementId: string): Promise<RuntimeSnapshot> {
+  const response = await invoke<unknown>("remove_element", { surfaceId, elementId });
+  return runtimeSnapshotSchema.parse(response);
+}
+
 export async function toggleFullscreen(): Promise<boolean> {
   return invoke<boolean>("toggle_fullscreen");
 }

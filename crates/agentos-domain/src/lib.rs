@@ -129,11 +129,54 @@ pub enum TextRun {
     },
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct GuiDocument {
     revision: u64,
     root_surface_id: SurfaceId,
     surfaces: HashMap<SurfaceId, Surface>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum GuiOperation {
+    AddElementAuto {
+        surface_id: SurfaceId,
+        element: Element,
+    },
+    AddElementAt {
+        surface_id: SurfaceId,
+        element: Element,
+    },
+    RemoveElement {
+        surface_id: SurfaceId,
+        element_id: String,
+    },
+    RepositionElement {
+        surface_id: SurfaceId,
+        element_id: String,
+        x: u8,
+        y: u8,
+    },
+    ResizeElement {
+        surface_id: SurfaceId,
+        element_id: String,
+        width: u8,
+        height: u8,
+    },
+    SetSurfaceRows {
+        surface_id: SurfaceId,
+        rows: u8,
+    },
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct OperationTransaction {
+    pub operations: Vec<GuiOperation>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct ApplyOutcome {
+    pub document: GuiDocument,
+    pub inverse: OperationTransaction,
 }
 
 impl GuiDocument {
@@ -183,6 +226,31 @@ impl GuiDocument {
         Ok(path)
     }
 
+    pub fn apply_transaction(
+        &self,
+        transaction: &OperationTransaction,
+    ) -> Result<ApplyOutcome, DomainError> {
+        if transaction.operations.is_empty() {
+            return Err(DomainError::EmptyTransaction);
+        }
+
+        let mut document = self.clone();
+        let mut inverse = Vec::new();
+        for operation in &transaction.operations {
+            let operation_inverse = document.apply_operation(operation)?;
+            inverse.splice(0..0, operation_inverse);
+        }
+        document.validate()?;
+        document.revision = self.revision + 1;
+
+        Ok(ApplyOutcome {
+            document,
+            inverse: OperationTransaction {
+                operations: inverse,
+            },
+        })
+    }
+
     pub fn reposition_element(
         &self,
         surface_id: &SurfaceId,
@@ -190,30 +258,15 @@ impl GuiDocument {
         x: u8,
         y: u8,
     ) -> Result<Self, DomainError> {
-        let surface = self.surface(surface_id)?;
-        let element = surface
-            .elements
-            .iter()
-            .find(|element| element.id() == element_id)
-            .ok_or_else(|| DomainError::ElementNotFound(element_id.into()))?;
-        let current = element.rect();
-        let candidate = GridRect::new(x, y, current.width, current.height)?;
-        Self::validate_element_rect(surface, element_id, candidate)?;
-
-        let mut document = self.clone();
-        let element = document
-            .surfaces
-            .get_mut(surface_id)
-            .and_then(|surface| {
-                surface
-                    .elements
-                    .iter_mut()
-                    .find(|element| element.id() == element_id)
-            })
-            .ok_or_else(|| DomainError::ElementNotFound(element_id.into()))?;
-        element.set_rect(candidate);
-        document.revision += 1;
-        Ok(document)
+        self.apply_transaction(&OperationTransaction {
+            operations: vec![GuiOperation::RepositionElement {
+                surface_id: surface_id.clone(),
+                element_id: element_id.into(),
+                x,
+                y,
+            }],
+        })
+        .map(|outcome| outcome.document)
     }
 
     pub fn resize_element(
@@ -223,19 +276,165 @@ impl GuiDocument {
         width: u8,
         height: u8,
     ) -> Result<Self, DomainError> {
-        let surface = self.surface(surface_id)?;
-        let element = surface
-            .elements
-            .iter()
-            .find(|element| element.id() == element_id)
-            .ok_or_else(|| DomainError::ElementNotFound(element_id.into()))?;
-        let current = element.rect();
-        let candidate = GridRect::new(current.x, current.y, width, height)?;
-        Self::validate_element_rect(surface, element_id, candidate)?;
+        self.apply_transaction(&OperationTransaction {
+            operations: vec![GuiOperation::ResizeElement {
+                surface_id: surface_id.clone(),
+                element_id: element_id.into(),
+                width,
+                height,
+            }],
+        })
+        .map(|outcome| outcome.document)
+    }
 
-        let mut document = self.clone();
-        let element = document
-            .surfaces
+    fn apply_operation(
+        &mut self,
+        operation: &GuiOperation,
+    ) -> Result<Vec<GuiOperation>, DomainError> {
+        match operation {
+            GuiOperation::AddElementAuto {
+                surface_id,
+                element,
+            } => {
+                self.ensure_unique_element_id(element.id())?;
+                let old_rows = self.surface(surface_id)?.rows;
+                let rect =
+                    self.find_first_fit(surface_id, element.rect().width, element.rect().height)?;
+                let surface = self
+                    .surfaces
+                    .get_mut(surface_id)
+                    .ok_or_else(|| DomainError::SurfaceNotFound(surface_id.clone()))?;
+                let required_rows = rect.y.saturating_add(rect.height);
+                surface.rows = surface.rows.max(required_rows);
+                let mut placed = element.clone();
+                placed.set_rect(rect);
+                surface.elements.push(placed);
+                Ok(vec![
+                    GuiOperation::RemoveElement {
+                        surface_id: surface_id.clone(),
+                        element_id: element.id().into(),
+                    },
+                    GuiOperation::SetSurfaceRows {
+                        surface_id: surface_id.clone(),
+                        rows: old_rows,
+                    },
+                ])
+            }
+            GuiOperation::AddElementAt {
+                surface_id,
+                element,
+            } => {
+                self.ensure_unique_element_id(element.id())?;
+                let surface = self.surface(surface_id)?;
+                Self::validate_element_rect(surface, element.id(), element.rect())?;
+                self.surfaces
+                    .get_mut(surface_id)
+                    .ok_or_else(|| DomainError::SurfaceNotFound(surface_id.clone()))?
+                    .elements
+                    .push(element.clone());
+                Ok(vec![GuiOperation::RemoveElement {
+                    surface_id: surface_id.clone(),
+                    element_id: element.id().into(),
+                }])
+            }
+            GuiOperation::RemoveElement {
+                surface_id,
+                element_id,
+            } => {
+                let surface = self
+                    .surfaces
+                    .get_mut(surface_id)
+                    .ok_or_else(|| DomainError::SurfaceNotFound(surface_id.clone()))?;
+                let index = surface
+                    .elements
+                    .iter()
+                    .position(|element| element.id() == element_id)
+                    .ok_or_else(|| DomainError::ElementNotFound(element_id.clone()))?;
+                let element = surface.elements.remove(index);
+                Ok(vec![GuiOperation::AddElementAt {
+                    surface_id: surface_id.clone(),
+                    element,
+                }])
+            }
+            GuiOperation::RepositionElement {
+                surface_id,
+                element_id,
+                x,
+                y,
+            } => {
+                let surface = self.surface(surface_id)?;
+                let current = surface
+                    .elements
+                    .iter()
+                    .find(|element| element.id() == element_id)
+                    .ok_or_else(|| DomainError::ElementNotFound(element_id.clone()))?
+                    .rect();
+                let candidate = GridRect::new(*x, *y, current.width, current.height)?;
+                Self::validate_element_rect(surface, element_id, candidate)?;
+                self.element_mut(surface_id, element_id)?
+                    .set_rect(candidate);
+                Ok(vec![GuiOperation::RepositionElement {
+                    surface_id: surface_id.clone(),
+                    element_id: element_id.clone(),
+                    x: current.x,
+                    y: current.y,
+                }])
+            }
+            GuiOperation::ResizeElement {
+                surface_id,
+                element_id,
+                width,
+                height,
+            } => {
+                let surface = self.surface(surface_id)?;
+                let current = surface
+                    .elements
+                    .iter()
+                    .find(|element| element.id() == element_id)
+                    .ok_or_else(|| DomainError::ElementNotFound(element_id.clone()))?
+                    .rect();
+                let candidate = GridRect::new(current.x, current.y, *width, *height)?;
+                Self::validate_element_rect(surface, element_id, candidate)?;
+                self.element_mut(surface_id, element_id)?
+                    .set_rect(candidate);
+                Ok(vec![GuiOperation::ResizeElement {
+                    surface_id: surface_id.clone(),
+                    element_id: element_id.clone(),
+                    width: current.width,
+                    height: current.height,
+                }])
+            }
+            GuiOperation::SetSurfaceRows { surface_id, rows } => {
+                if *rows == 0 {
+                    return Err(DomainError::InvalidSurfaceBounds(surface_id.clone()));
+                }
+                let surface = self
+                    .surfaces
+                    .get_mut(surface_id)
+                    .ok_or_else(|| DomainError::SurfaceNotFound(surface_id.clone()))?;
+                if surface
+                    .elements
+                    .iter()
+                    .any(|element| element.rect().y.saturating_add(element.rect().height) > *rows)
+                {
+                    return Err(DomainError::SurfaceRowsOccupied(surface_id.clone()));
+                }
+                let old_rows = surface.rows;
+                surface.rows = *rows;
+                Ok(vec![GuiOperation::SetSurfaceRows {
+                    surface_id: surface_id.clone(),
+                    rows: old_rows,
+                }])
+            }
+        }
+    }
+
+    fn element_mut(
+        &mut self,
+        surface_id: &SurfaceId,
+        element_id: &str,
+    ) -> Result<&mut Element, DomainError> {
+        self.surfaces
             .get_mut(surface_id)
             .and_then(|surface| {
                 surface
@@ -243,10 +442,45 @@ impl GuiDocument {
                     .iter_mut()
                     .find(|element| element.id() == element_id)
             })
-            .ok_or_else(|| DomainError::ElementNotFound(element_id.into()))?;
-        element.set_rect(candidate);
-        document.revision += 1;
-        Ok(document)
+            .ok_or_else(|| DomainError::ElementNotFound(element_id.into()))
+    }
+
+    fn ensure_unique_element_id(&self, element_id: &str) -> Result<(), DomainError> {
+        if self
+            .surfaces
+            .values()
+            .flat_map(|surface| &surface.elements)
+            .any(|element| element.id() == element_id)
+        {
+            return Err(DomainError::DuplicateElement(element_id.into()));
+        }
+        Ok(())
+    }
+
+    fn find_first_fit(
+        &self,
+        surface_id: &SurfaceId,
+        width: u8,
+        height: u8,
+    ) -> Result<GridRect, DomainError> {
+        let surface = self.surface(surface_id)?;
+        if width == 0 || height == 0 || width > surface.columns {
+            return Err(DomainError::InvalidRect);
+        }
+        let max_rows = u8::MAX.saturating_sub(height).saturating_add(1);
+        for y in 0..max_rows {
+            for x in 0..=surface.columns - width {
+                let candidate = GridRect::new(x, y, width, height)?;
+                if surface
+                    .elements
+                    .iter()
+                    .all(|element| !candidate.intersects(element.rect()))
+                {
+                    return Ok(candidate);
+                }
+            }
+        }
+        Err(DomainError::NoPlacementSpace)
     }
 
     fn validate(&self) -> Result<(), DomainError> {
@@ -341,14 +575,17 @@ pub enum DomainError {
     ElementCollision { first: String, second: String },
     ElementNotFound(String),
     ElementOutOfBounds(String),
+    EmptyTransaction,
     EmptySurfaceId,
     InvalidRect,
     InvalidSurfaceBounds(SurfaceId),
     MissingParent(SurfaceId),
     MissingTarget(SurfaceId),
+    NoPlacementSpace,
     RootHasParent,
     SurfaceCycle(SurfaceId),
     SurfaceNotFound(SurfaceId),
+    SurfaceRowsOccupied(SurfaceId),
 }
 
 impl fmt::Display for DomainError {
@@ -361,6 +598,7 @@ impl fmt::Display for DomainError {
             }
             Self::ElementNotFound(id) => write!(formatter, "element not found: {id}"),
             Self::ElementOutOfBounds(id) => write!(formatter, "element out of bounds: {id}"),
+            Self::EmptyTransaction => formatter.write_str("operation transaction cannot be empty"),
             Self::EmptySurfaceId => formatter.write_str("surface id cannot be empty"),
             Self::InvalidRect => formatter.write_str("rect width and height must be positive"),
             Self::InvalidSurfaceBounds(id) => {
@@ -372,9 +610,13 @@ impl fmt::Display for DomainError {
             }
             Self::MissingParent(id) => write!(formatter, "surface has no parent: {}", id.as_str()),
             Self::MissingTarget(id) => write!(formatter, "missing surface target: {}", id.as_str()),
+            Self::NoPlacementSpace => formatter.write_str("no placement space available"),
             Self::RootHasParent => formatter.write_str("root surface cannot have a parent"),
             Self::SurfaceCycle(id) => write!(formatter, "surface cycle: {}", id.as_str()),
             Self::SurfaceNotFound(id) => write!(formatter, "surface not found: {}", id.as_str()),
+            Self::SurfaceRowsOccupied(id) => {
+                write!(formatter, "surface rows are occupied: {}", id.as_str())
+            }
         }
     }
 }
@@ -384,7 +626,8 @@ impl std::error::Error for DomainError {}
 #[cfg(test)]
 mod tests {
     use super::{
-        Element, GridRect, GuiDocument, Surface, SurfaceId, TextPanel, TextRun, TimePanel,
+        Element, GridRect, GuiDocument, GuiOperation, OperationTransaction, Surface, SurfaceId,
+        TextPanel, TextRun, TimePanel,
     };
 
     fn surface(id: &str, parent_id: Option<&str>) -> Surface {
@@ -555,5 +798,88 @@ mod tests {
         let result = GuiDocument::new(1, SurfaceId::new("desktop").unwrap(), vec![desktop]);
 
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn transaction_is_atomic_when_a_later_operation_fails() {
+        let document = GuiDocument::new(
+            1,
+            SurfaceId::new("desktop").unwrap(),
+            vec![surface("desktop", None)],
+        )
+        .unwrap();
+        let id = SurfaceId::new("desktop").unwrap();
+        let element = Element::TimePanel(TimePanel {
+            id: "clock".into(),
+            title: "Clock".into(),
+            timezone: "local".into(),
+            rect: GridRect::new(0, 0, 4, 1).unwrap(),
+        });
+        let transaction = OperationTransaction {
+            operations: vec![
+                GuiOperation::AddElementAuto {
+                    surface_id: id.clone(),
+                    element,
+                },
+                GuiOperation::RemoveElement {
+                    surface_id: id,
+                    element_id: "missing".into(),
+                },
+            ],
+        };
+
+        assert!(document.apply_transaction(&transaction).is_err());
+        assert_eq!(document.revision(), 1);
+        assert!(
+            document
+                .surface(&SurfaceId::new("desktop").unwrap())
+                .unwrap()
+                .elements
+                .is_empty()
+        );
+    }
+
+    #[test]
+    fn add_auto_expands_rows_and_inverse_restores_document() {
+        let mut desktop = surface("desktop", None);
+        desktop.rows = 1;
+        desktop.elements.push(Element::TimePanel(TimePanel {
+            id: "full-row".into(),
+            title: "Full".into(),
+            timezone: "local".into(),
+            rect: GridRect::new(0, 0, 12, 1).unwrap(),
+        }));
+        let document =
+            GuiDocument::new(1, SurfaceId::new("desktop").unwrap(), vec![desktop]).unwrap();
+        let transaction = OperationTransaction {
+            operations: vec![GuiOperation::AddElementAuto {
+                surface_id: SurfaceId::new("desktop").unwrap(),
+                element: Element::TimePanel(TimePanel {
+                    id: "clock".into(),
+                    title: "Clock".into(),
+                    timezone: "local".into(),
+                    rect: GridRect::new(0, 0, 4, 1).unwrap(),
+                }),
+            }],
+        };
+
+        let outcome = document.apply_transaction(&transaction).unwrap();
+        assert_eq!(outcome.document.revision(), 2);
+        assert_eq!(
+            outcome
+                .document
+                .surface(&SurfaceId::new("desktop").unwrap())
+                .unwrap()
+                .rows,
+            2
+        );
+        let restored = outcome
+            .document
+            .apply_transaction(&outcome.inverse)
+            .unwrap()
+            .document;
+        let mut expected = document.clone();
+        expected.revision = restored.revision();
+        assert_eq!(restored, expected);
     }
 }

@@ -49,6 +49,31 @@ fn resize_element(
 }
 
 #[tauri::command]
+fn add_time_panel(
+    surface_id: String,
+    title: String,
+    timezone: String,
+    runtime: State<'_, Mutex<agentos_application::Runtime>>,
+) -> Result<RuntimeSnapshotDto, String> {
+    runtime
+        .lock()
+        .map_err(|_| "runtime lock poisoned".to_string())?
+        .add_time_panel(&surface_id, &title, &timezone)
+}
+
+#[tauri::command]
+fn remove_element(
+    surface_id: String,
+    element_id: String,
+    runtime: State<'_, Mutex<agentos_application::Runtime>>,
+) -> Result<RuntimeSnapshotDto, String> {
+    runtime
+        .lock()
+        .map_err(|_| "runtime lock poisoned".to_string())?
+        .remove_element(&surface_id, &element_id)
+}
+
+#[tauri::command]
 fn is_fullscreen(window: Window) -> Result<bool, String> {
     window.is_fullscreen().map_err(|error| error.to_string())
 }
@@ -72,6 +97,8 @@ pub fn run() {
             open_surface,
             reposition_element,
             resize_element,
+            add_time_panel,
+            remove_element,
             is_fullscreen,
             toggle_fullscreen
         ])

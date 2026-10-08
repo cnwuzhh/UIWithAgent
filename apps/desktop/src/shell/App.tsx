@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Bot, ChevronRight, Command, LayoutDashboard, Maximize2, Minimize2, Plus, Search } from "lucide-react";
 import type { RuntimeSnapshot } from "../contracts";
-import { getRuntimeSnapshot, isFullscreen, openSurface, repositionElement, resizeElement, toggleFullscreen } from "../ipc/client";
+import { addTimePanel, getRuntimeSnapshot, isFullscreen, openSurface, removeElement, repositionElement, resizeElement, toggleFullscreen } from "../ipc/client";
 import { SurfaceView } from "../surface/SurfaceView";
 
 type LoadState =
@@ -57,6 +57,28 @@ export function App() {
     }
   }
 
+  async function handleAddTimePanel() {
+    if (state.status !== "ready") return "Runtime 暂时不可写";
+    try {
+      const snapshot = await addTimePanel(state.snapshot.currentSurfaceId, "新时钟", "local");
+      setState({ status: "ready", snapshot });
+      return undefined;
+    } catch (error: unknown) {
+      return error instanceof Error ? error.message : "无法添加时钟";
+    }
+  }
+
+  async function handleRemoveElement(elementId: string) {
+    if (state.status !== "ready") return "Runtime 暂时不可写";
+    try {
+      const snapshot = await removeElement(state.snapshot.currentSurfaceId, elementId);
+      setState({ status: "ready", snapshot });
+      return undefined;
+    } catch (error: unknown) {
+      return error instanceof Error ? error.message : "无法删除元素";
+    }
+  }
+
   async function handleToggleFullscreen() {
     try {
       setFullscreen(await toggleFullscreen());
@@ -100,10 +122,13 @@ export function App() {
       {state.status === "failed" && <section className="status-page error">{state.message}</section>}
       {state.status === "ready" && (
         <SurfaceView
+          revision={state.snapshot.revision}
           surface={state.snapshot.surface}
           onOpenSurface={handleOpenSurface}
           onRepositionElement={handleRepositionElement}
           onResizeElement={handleResizeElement}
+          onAddTimePanel={handleAddTimePanel}
+          onRemoveElement={handleRemoveElement}
         />
       )}
 
