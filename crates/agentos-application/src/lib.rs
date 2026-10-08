@@ -1,8 +1,8 @@
 use agentos_contracts::{
-    BreadcrumbItemDto, ElementDto, RuntimeSnapshotDto, SurfaceDto, TextRunDto,
+    BreadcrumbItemDto, ElementDto, GridRectDto, RuntimeSnapshotDto, SurfaceDto, TextRunDto,
 };
 use agentos_domain::{
-    AppIcon, Element, GuiDocument, Surface, SurfaceId, TextPanel, TextRun, TimePanel,
+    AppIcon, Element, GridRect, GuiDocument, Surface, SurfaceId, TextPanel, TextRun, TimePanel,
 };
 
 pub struct Runtime {
@@ -23,30 +23,32 @@ impl Runtime {
                     parent_id: None,
                     title: "桌面".into(),
                     icon: "layout-dashboard".into(),
+                    columns: 12,
+                    rows: 4,
                     elements: vec![
                         Element::TimePanel(TimePanel {
                             id: "time-local".into(),
                             title: "当地时间".into(),
                             timezone: "local".into(),
-                            column: 1,
+                            rect: rect(0, 0, 4, 1),
                         }),
                         Element::TimePanel(TimePanel {
                             id: "time-london".into(),
                             title: "伦敦".into(),
                             timezone: "Europe/London".into(),
-                            column: 5,
+                            rect: rect(4, 0, 4, 1),
                         }),
                         Element::TimePanel(TimePanel {
                             id: "time-los-angeles".into(),
                             title: "洛杉矶".into(),
                             timezone: "America/Los_Angeles".into(),
-                            column: 9,
+                            rect: rect(8, 0, 4, 1),
                         }),
                         Element::AppIcon(AppIcon {
                             id: "app-workspace".into(),
                             title: "工作桌面".into(),
                             target_surface_id: work_id.clone(),
-                            column: 1,
+                            rect: rect(0, 1, 2, 1),
                         }),
                         Element::TextPanel(TextPanel {
                             id: "text-getting-started".into(),
@@ -59,7 +61,7 @@ impl Runtime {
                                 },
                                 TextRun::Text("。正文中的引用不会改变 Surface 主树关系。".into()),
                             ],
-                            column: 3,
+                            rect: rect(2, 1, 6, 1),
                         }),
                     ],
                 },
@@ -68,11 +70,13 @@ impl Runtime {
                     parent_id: Some(desktop_id.clone()),
                     title: "工作桌面".into(),
                     icon: "briefcase-business".into(),
+                    columns: 12,
+                    rows: 4,
                     elements: vec![Element::TimePanel(TimePanel {
                         id: "time-work".into(),
                         title: "工作时间".into(),
                         timezone: "local".into(),
-                        column: 1,
+                        rect: rect(0, 0, 4, 1),
                     })],
                 },
             ],
@@ -95,6 +99,21 @@ impl Runtime {
         let snapshot = self.snapshot_for(&target)?;
         self.current_surface_id = target;
         Ok(snapshot)
+    }
+
+    pub fn reposition_element(
+        &mut self,
+        surface_id: &str,
+        element_id: &str,
+        x: u8,
+        y: u8,
+    ) -> Result<RuntimeSnapshotDto, String> {
+        let surface_id = SurfaceId::new(surface_id).map_err(|error| error.to_string())?;
+        self.document = self
+            .document
+            .reposition_element(&surface_id, element_id, x, y)
+            .map_err(|error| error.to_string())?;
+        self.snapshot_for(&self.current_surface_id)
     }
 
     fn snapshot_for(&self, surface_id: &SurfaceId) -> Result<RuntimeSnapshotDto, String> {
@@ -126,6 +145,8 @@ impl Runtime {
             id: surface.id.as_str().into(),
             title: surface.title.clone(),
             icon: surface.icon.clone(),
+            columns: surface.columns,
+            rows: surface.rows,
             elements: surface
                 .elements
                 .iter()
@@ -140,7 +161,7 @@ impl Runtime {
                 id: panel.id.clone(),
                 title: panel.title.clone(),
                 timezone: panel.timezone.clone(),
-                column: panel.column,
+                rect: rect_to_dto(panel.rect),
             },
             Element::AppIcon(icon) => {
                 let target = self
@@ -153,7 +174,7 @@ impl Runtime {
                     icon: target.icon.clone(),
                     status: "ready".into(),
                     target_surface_id: icon.target_surface_id.as_str().into(),
-                    column: icon.column,
+                    rect: rect_to_dto(icon.rect),
                 }
             }
             Element::TextPanel(panel) => ElementDto::TextPanel {
@@ -175,7 +196,7 @@ impl Runtime {
                         },
                     })
                     .collect(),
-                column: panel.column,
+                rect: rect_to_dto(panel.rect),
             },
         })
     }
@@ -183,6 +204,19 @@ impl Runtime {
 
 fn surface_id(value: &str) -> SurfaceId {
     SurfaceId::new(value).expect("static surface id must be valid")
+}
+
+fn rect(x: u8, y: u8, width: u8, height: u8) -> GridRect {
+    GridRect::new(x, y, width, height).expect("static rect must be valid")
+}
+
+fn rect_to_dto(rect: GridRect) -> GridRectDto {
+    GridRectDto {
+        x: rect.x,
+        y: rect.y,
+        width: rect.width,
+        height: rect.height,
+    }
 }
 
 #[cfg(test)]
@@ -251,5 +285,29 @@ mod tests {
             .unwrap();
 
         assert_eq!(target, "surface-work");
+    }
+
+    #[test]
+    fn reposition_returns_incremented_snapshot() {
+        let mut runtime = Runtime::demo();
+        let snapshot = runtime
+            .reposition_element("surface-desktop", "app-workspace", 8, 2)
+            .unwrap();
+
+        assert_eq!(snapshot.revision, 2);
+        let rect = snapshot
+            .surface
+            .elements
+            .iter()
+            .find_map(|element| match element {
+                agentos_contracts::ElementDto::AppIcon { id, rect, .. }
+                    if id == "app-workspace" =>
+                {
+                    Some(rect)
+                }
+                _ => None,
+            })
+            .unwrap();
+        assert_eq!((rect.x, rect.y), (8, 2));
     }
 }

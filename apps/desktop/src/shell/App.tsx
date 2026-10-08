@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Bot, ChevronRight, Command, LayoutDashboard, Plus, Search } from "lucide-react";
 import type { RuntimeSnapshot } from "../contracts";
-import { getRuntimeSnapshot, openSurface } from "../ipc/client";
+import { getRuntimeSnapshot, openSurface, repositionElement } from "../ipc/client";
 import { SurfaceView } from "../surface/SurfaceView";
 
 type LoadState =
@@ -31,6 +31,17 @@ export function App() {
     }
   }
 
+  async function handleRepositionElement(elementId: string, x: number, y: number) {
+    if (state.status !== "ready") return "Runtime 暂时不可写";
+    try {
+      const snapshot = await repositionElement(state.snapshot.currentSurfaceId, elementId, x, y);
+      setState({ status: "ready", snapshot });
+      return undefined;
+    } catch (error: unknown) {
+      return error instanceof Error ? error.message : "无法移动元素";
+    }
+  }
+
   return (
     <main className="app-shell">
       <header className="titlebar">
@@ -55,7 +66,11 @@ export function App() {
       {state.status === "loading" && <section className="status-page">正在连接 Runtime...</section>}
       {state.status === "failed" && <section className="status-page error">{state.message}</section>}
       {state.status === "ready" && (
-        <SurfaceView surface={state.snapshot.surface} onOpenSurface={handleOpenSurface} />
+        <SurfaceView
+          surface={state.snapshot.surface}
+          onOpenSurface={handleOpenSurface}
+          onRepositionElement={handleRepositionElement}
+        />
       )}
 
       <aside className="agent-dock" aria-label="Agent 构建入口">

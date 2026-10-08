@@ -10,3 +10,13 @@ export async function openSurface(surfaceId: string): Promise<RuntimeSnapshot> {
   const response = await invoke<unknown>("open_surface", { surfaceId });
   return runtimeSnapshotSchema.parse(response);
 }
+
+export async function repositionElement(
+  surfaceId: string,
+  elementId: string,
+  x: number,
+  y: number,
+): Promise<RuntimeSnapshot> {
+  const response = await invoke<unknown>("reposition_element", { surfaceId, elementId, x, y });
+  return runtimeSnapshotSchema.parse(response);
+}

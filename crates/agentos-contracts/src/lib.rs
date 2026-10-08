@@ -22,7 +22,18 @@ pub struct SurfaceDto {
     pub id: String,
     pub title: String,
     pub icon: String,
+    pub columns: u8,
+    pub rows: u8,
     pub elements: Vec<ElementDto>,
+}
+
+#[derive(Clone, Copy, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GridRectDto {
+    pub x: u8,
+    pub y: u8,
+    pub width: u8,
+    pub height: u8,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -36,7 +47,7 @@ pub enum ElementDto {
         id: String,
         title: String,
         timezone: String,
-        column: u8,
+        rect: GridRectDto,
     },
     AppIcon {
         id: String,
@@ -44,13 +55,13 @@ pub enum ElementDto {
         icon: String,
         status: String,
         target_surface_id: String,
-        column: u8,
+        rect: GridRectDto,
     },
     TextPanel {
         id: String,
         title: String,
         runs: Vec<TextRunDto>,
-        column: u8,
+        rect: GridRectDto,
     },
 }
 
@@ -72,7 +83,7 @@ pub enum TextRunDto {
 
 #[cfg(test)]
 mod tests {
-    use super::{ElementDto, TextRunDto};
+    use super::{ElementDto, GridRectDto, TextRunDto};
     use serde_json::json;
 
     #[test]
@@ -83,7 +94,12 @@ mod tests {
             icon: "briefcase".into(),
             status: "ready".into(),
             target_surface_id: "surface-work".into(),
-            column: 1,
+            rect: GridRectDto {
+                x: 0,
+                y: 1,
+                width: 2,
+                height: 1,
+            },
         };
         let surface_link = TextRunDto::SurfaceLink {
             label: "Work".into(),
@@ -99,7 +115,7 @@ mod tests {
                 "icon": "briefcase",
                 "status": "ready",
                 "targetSurfaceId": "surface-work",
-                "column": 1
+                "rect": { "x": 0, "y": 1, "width": 2, "height": 1 }
             })
         );
         assert_eq!(

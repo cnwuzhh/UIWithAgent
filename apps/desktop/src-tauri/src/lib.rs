@@ -20,11 +20,29 @@ fn open_surface(
         .open_surface(&surface_id)
 }
 
+#[tauri::command]
+fn reposition_element(
+    surface_id: String,
+    element_id: String,
+    x: u8,
+    y: u8,
+    runtime: State<'_, Mutex<agentos_application::Runtime>>,
+) -> Result<RuntimeSnapshotDto, String> {
+    runtime
+        .lock()
+        .map_err(|_| "runtime lock poisoned".to_string())?
+        .reposition_element(&surface_id, &element_id, x, y)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .manage(Mutex::new(agentos_application::Runtime::demo()))
-        .invoke_handler(tauri::generate_handler![get_runtime_snapshot, open_surface])
+        .invoke_handler(tauri::generate_handler![
+            get_runtime_snapshot,
+            open_surface,
+            reposition_element
+        ])
         .run(tauri::generate_context!())
         .expect("failed to run UI With Agent");
 }

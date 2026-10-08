@@ -1,11 +1,18 @@
 import { z } from "zod";
 
+const gridRectSchema = z.object({
+  x: z.number(),
+  y: z.number(),
+  width: z.number().positive(),
+  height: z.number().positive(),
+});
+
 const timePanelSchema = z.object({
   type: z.literal("timePanel"),
   id: z.string(),
   title: z.string(),
   timezone: z.string(),
-  column: z.number(),
+  rect: gridRectSchema,
 });
 
 const appIconSchema = z.object({
@@ -15,7 +22,7 @@ const appIconSchema = z.object({
   icon: z.string(),
   status: z.string(),
   targetSurfaceId: z.string(),
-  column: z.number(),
+  rect: gridRectSchema,
 });
 
 const textPanelSchema = z.object({
@@ -26,7 +33,7 @@ const textPanelSchema = z.object({
     z.object({ type: z.literal("text"), content: z.string() }),
     z.object({ type: z.literal("surfaceLink"), label: z.string(), targetSurfaceId: z.string() }),
   ])),
-  column: z.number(),
+  rect: gridRectSchema,
 });
 
 export const runtimeSnapshotSchema = z.object({
@@ -37,6 +44,8 @@ export const runtimeSnapshotSchema = z.object({
     id: z.string(),
     title: z.string(),
     icon: z.string(),
+    columns: z.number().positive(),
+    rows: z.number().positive(),
     elements: z.array(z.discriminatedUnion("type", [timePanelSchema, appIconSchema, textPanelSchema])),
   }),
 });
