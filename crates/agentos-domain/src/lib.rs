@@ -31,6 +31,7 @@ pub struct Surface {
 pub enum Element {
     TimePanel(TimePanel),
     AppIcon(AppIcon),
+    TextPanel(TextPanel),
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -47,6 +48,23 @@ pub struct AppIcon {
     pub title: String,
     pub target_surface_id: SurfaceId,
     pub column: u8,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct TextPanel {
+    pub id: String,
+    pub title: String,
+    pub runs: Vec<TextRun>,
+    pub column: u8,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum TextRun {
+    Text(String),
+    SurfaceLink {
+        label: String,
+        target_surface_id: SurfaceId,
+    },
 }
 
 #[derive(Clone, Debug)]
@@ -124,13 +142,29 @@ impl GuiDocument {
             }
 
             for element in &surface.elements {
-                if let Element::AppIcon(icon) = element {
-                    self.surface(&icon.target_surface_id)
-                        .map_err(|_| DomainError::MissingTarget(icon.target_surface_id.clone()))?;
+                match element {
+                    Element::AppIcon(icon) => self.validate_target(&icon.target_surface_id)?,
+                    Element::TextPanel(panel) => {
+                        for run in &panel.runs {
+                            if let TextRun::SurfaceLink {
+                                target_surface_id, ..
+                            } = run
+                            {
+                                self.validate_target(target_surface_id)?;
+                            }
+                        }
+                    }
+                    Element::TimePanel(_) => {}
                 }
             }
         }
         Ok(())
+    }
+
+    fn validate_target(&self, id: &SurfaceId) -> Result<(), DomainError> {
+        self.surface(id)
+            .map(|_| ())
+            .map_err(|_| DomainError::MissingTarget(id.clone()))
     }
 }
 
@@ -163,7 +197,7 @@ impl std::error::Error for DomainError {}
 
 #[cfg(test)]
 mod tests {
-    use super::{GuiDocument, Surface, SurfaceId};
+    use super::{Element, GuiDocument, Surface, SurfaceId, TextPanel, TextRun};
 
     fn surface(id: &str, parent_id: Option<&str>) -> Surface {
         Surface {
@@ -202,6 +236,24 @@ mod tests {
                 surface("b", Some("a")),
             ],
         );
+
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn rejects_missing_embedded_text_target() {
+        let mut desktop = surface("desktop", None);
+        desktop.elements.push(Element::TextPanel(TextPanel {
+            id: "welcome".into(),
+            title: "Welcome".into(),
+            runs: vec![TextRun::SurfaceLink {
+                label: "Missing".into(),
+                target_surface_id: SurfaceId::new("missing").unwrap(),
+            }],
+            column: 1,
+        }));
+
+        let result = GuiDocument::new(1, SurfaceId::new("desktop").unwrap(), vec![desktop]);
 
         assert!(result.is_err());
     }

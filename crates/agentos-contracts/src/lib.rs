@@ -42,4 +42,22 @@ pub enum ElementDto {
         target_surface_id: String,
         column: u8,
     },
+    TextPanel {
+        id: String,
+        title: String,
+        runs: Vec<TextRunDto>,
+        column: u8,
+    },
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(tag = "type", rename_all = "camelCase")]
+pub enum TextRunDto {
+    Text {
+        content: String,
+    },
+    SurfaceLink {
+        label: String,
+        target_surface_id: String,
+    },
 }

@@ -1,5 +1,9 @@
-use agentos_contracts::{BreadcrumbItemDto, ElementDto, RuntimeSnapshotDto, SurfaceDto};
-use agentos_domain::{AppIcon, Element, GuiDocument, Surface, SurfaceId, TimePanel};
+use agentos_contracts::{
+    BreadcrumbItemDto, ElementDto, RuntimeSnapshotDto, SurfaceDto, TextRunDto,
+};
+use agentos_domain::{
+    AppIcon, Element, GuiDocument, Surface, SurfaceId, TextPanel, TextRun, TimePanel,
+};
 
 pub struct Runtime {
     document: GuiDocument,
@@ -43,6 +47,19 @@ impl Runtime {
                             title: "工作桌面".into(),
                             target_surface_id: work_id.clone(),
                             column: 1,
+                        }),
+                        Element::TextPanel(TextPanel {
+                            id: "text-getting-started".into(),
+                            title: "开始使用".into(),
+                            runs: vec![
+                                TextRun::Text("项目资料和工作时钟位于 ".into()),
+                                TextRun::SurfaceLink {
+                                    label: "工作桌面".into(),
+                                    target_surface_id: work_id.clone(),
+                                },
+                                TextRun::Text("。正文中的引用不会改变 Surface 主树关系。".into()),
+                            ],
+                            column: 3,
                         }),
                     ],
                 },
@@ -139,6 +156,27 @@ impl Runtime {
                     column: icon.column,
                 }
             }
+            Element::TextPanel(panel) => ElementDto::TextPanel {
+                id: panel.id.clone(),
+                title: panel.title.clone(),
+                runs: panel
+                    .runs
+                    .iter()
+                    .map(|run| match run {
+                        TextRun::Text(content) => TextRunDto::Text {
+                            content: content.clone(),
+                        },
+                        TextRun::SurfaceLink {
+                            label,
+                            target_surface_id,
+                        } => TextRunDto::SurfaceLink {
+                            label: label.clone(),
+                            target_surface_id: target_surface_id.as_str().into(),
+                        },
+                    })
+                    .collect(),
+                column: panel.column,
+            },
         })
     }
 }
@@ -190,5 +228,28 @@ mod tests {
             .unwrap();
 
         assert_eq!(icon, "briefcase-business");
+    }
+
+    #[test]
+    fn embedded_text_exposes_surface_target() {
+        let snapshot = Runtime::demo().snapshot();
+        let target = snapshot
+            .surface
+            .elements
+            .iter()
+            .find_map(|element| match element {
+                agentos_contracts::ElementDto::TextPanel { runs, .. } => {
+                    runs.iter().find_map(|run| match run {
+                        agentos_contracts::TextRunDto::SurfaceLink {
+                            target_surface_id, ..
+                        } => Some(target_surface_id),
+                        _ => None,
+                    })
+                }
+                _ => None,
+            })
+            .unwrap();
+
+        assert_eq!(target, "surface-work");
     }
 }

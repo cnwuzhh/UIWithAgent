@@ -18,6 +18,17 @@ const appIconSchema = z.object({
   column: z.number(),
 });
 
+const textPanelSchema = z.object({
+  type: z.literal("textPanel"),
+  id: z.string(),
+  title: z.string(),
+  runs: z.array(z.discriminatedUnion("type", [
+    z.object({ type: z.literal("text"), content: z.string() }),
+    z.object({ type: z.literal("surfaceLink"), label: z.string(), targetSurfaceId: z.string() }),
+  ])),
+  column: z.number(),
+});
+
 export const runtimeSnapshotSchema = z.object({
   revision: z.number(),
   currentSurfaceId: z.string(),
@@ -26,7 +37,7 @@ export const runtimeSnapshotSchema = z.object({
     id: z.string(),
     title: z.string(),
     icon: z.string(),
-    elements: z.array(z.discriminatedUnion("type", [timePanelSchema, appIconSchema])),
+    elements: z.array(z.discriminatedUnion("type", [timePanelSchema, appIconSchema, textPanelSchema])),
   }),
 });
 

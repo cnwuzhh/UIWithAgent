@@ -44,6 +44,31 @@ function AppIcon({ element, onOpenSurface }: {
   );
 }
 
+function TextPanel({ element, onOpenSurface }: {
+  element: Extract<SurfaceElement, { type: "textPanel" }>;
+  onOpenSurface: (surfaceId: string) => void;
+}) {
+  return (
+    <article className="text-panel" style={{ gridColumn: `${element.column} / span 6` }}>
+      <h2>{element.title}</h2>
+      <p>{element.runs.map((run, index) => run.type === "text"
+        ? <span key={index}>{run.content}</span>
+        : <button type="button" key={index} onClick={() => onOpenSurface(run.targetSurfaceId)}>{run.label}</button>)}</p>
+    </article>
+  );
+}
+
+function SurfaceElementView({ element, onOpenSurface }: {
+  element: SurfaceElement;
+  onOpenSurface: (surfaceId: string) => void;
+}) {
+  switch (element.type) {
+    case "timePanel": return <TimePanel element={element} />;
+    case "appIcon": return <AppIcon element={element} onOpenSurface={onOpenSurface} />;
+    case "textPanel": return <TextPanel element={element} onOpenSurface={onOpenSurface} />;
+  }
+}
+
 export function SurfaceView({ surface, onOpenSurface }: {
   surface: RuntimeSnapshot["surface"];
   onOpenSurface: (surfaceId: string) => void;
@@ -55,9 +80,9 @@ export function SurfaceView({ surface, onOpenSurface }: {
         <span className="surface-id">{surface.id}</span>
       </div>
       <div className="surface-grid">
-        {surface.elements.map((element) => element.type === "timePanel"
-          ? <TimePanel element={element} key={element.id} />
-          : <AppIcon element={element} key={element.id} onOpenSurface={onOpenSurface} />)}
+        {surface.elements.map((element) => (
+          <SurfaceElementView element={element} key={element.id} onOpenSurface={onOpenSurface} />
+        ))}
       </div>
       <div className="navigator"><Search size={17} /><span>跳转到 Surface 或告诉 Agent 你要去哪里...</span><kbd>Enter</kbd></div>
     </section>

@@ -31,6 +31,11 @@ h1 { margin: 5px 0 0; font-size: 28px; letter-spacing: 0; }
 .app-icon { height: 100px; align-self: start; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border: 0; background: transparent; cursor: pointer; }
 .app-icon > span { width: 50px; height: 50px; display: grid; place-items: center; color: #f9f7ef; background: #bc5545; box-shadow: 4px 4px 0 #7f3026; }
 .app-icon strong { font-size: 12px; }
+.text-panel { min-height: 112px; padding: 17px 20px; border-left: 4px solid #d5a33f; background: #fdfcf8; box-shadow: 3px 3px 0 #cac8be; }
+.text-panel h2 { margin: 0 0 10px; font-size: 14px; }
+.text-panel p { margin: 0; color: #555b54; font-size: 13px; line-height: 1.65; }
+.text-panel button { padding: 0; border: 0; border-bottom: 1px solid currentColor; color: #22665a; background: transparent; font-weight: 700; cursor: pointer; }
+.text-panel button:hover, .text-panel button:focus-visible { color: #a33f32; outline: none; }
 .navigator { margin: 0 30px 24px; height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border: 1px solid #aaa99f; background: #fdfcf8; color: #686c65; font-size: 12px; }
 .navigator kbd { margin-left: auto; font-family: "Ubuntu Mono", monospace; font-size: 10px; }
 .agent-dock { position: fixed; right: 24px; bottom: 20px; left: 24px; height: 62px; display: flex; align-items: center; gap: 12px; padding: 0 12px; color: #f7f5ef; background: #2e322d; box-shadow: 0 9px 24px #17191433; }
@@ -45,5 +50,5 @@ h1 { margin: 5px 0 0; font-size: 28px; letter-spacing: 0; }
 @media (max-width: 900px) {
   body { min-width: 0; }
   .surface-grid { grid-template-columns: 1fr; grid-auto-rows: auto; }
-  .time-panel, .app-icon { grid-column: 1 !important; width: 100%; }
+  .time-panel, .app-icon, .text-panel { grid-column: 1 !important; width: 100%; }
 }
