@@ -1,0 +1,18 @@
+[package]
+name = "ui-with-agent-desktop"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[lib]
+name = "ui_with_agent_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build.workspace = true
+
+[dependencies]
+agentos-application.workspace = true
+agentos-contracts.workspace = true
+tauri.workspace = true

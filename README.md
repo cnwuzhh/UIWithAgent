@@ -35,3 +35,24 @@ Agent 只能通过受 capability 限制的系统 API 使用 Surface、构建任�
 2. 二维添加、移除、移动和缩放；
 3. Agent 构建入口与构建中占位图标；
 4. 本地持久化、校验与验收测试。
+
+## 工程基线
+
+首次构建已经建立 React 19、Tauri 2 与 Rust workspace，并打通只读 Runtime snapshot IPC：
+
+```text
+apps/desktop                 React Shell 与 Tauri bootstrap
+crates/agentos-contracts     跨 IPC DTO
+crates/agentos-application   确定性 Runtime snapshot
+```
+
+Ubuntu 24.04 开发命令：
+
+```bash
+just bootstrap
+just build
+just test
+just dev
+```
+
+当前窗口展示桌面 breadcrumb、三个时区面板、Surface 入口与 Agent 构建入口。权威写入、SQLite 和 Agent Worker 将按总体架构的后续阶段接入。

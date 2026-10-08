@@ -1,0 +1,48 @@
+:root {
+  font-family: "Ubuntu", "Noto Sans", sans-serif;
+  color: #20231f;
+  background: #e9e7df;
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 800px; min-height: 100vh; }
+button { font: inherit; }
+
+.app-shell { min-height: 100vh; display: grid; grid-template-rows: 48px 52px 1fr; background: #e9e7df; }
+.titlebar { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; color: #f8f7f2; background: #20231f; }
+.brand, .system-state { display: flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 700; }
+.system-state { color: #c9cec5; font-family: "Ubuntu Mono", monospace; font-size: 11px; font-weight: 400; }
+.system-state span { width: 7px; height: 7px; border-radius: 50%; background: #83c97b; box-shadow: 0 0 0 3px #83c97b22; }
+.breadcrumb { display: flex; align-items: center; gap: 4px; padding: 0 24px; border-bottom: 1px solid #cac8bf; background: #f4f2ec; }
+.breadcrumb-item { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; }
+.icon-button { margin-left: auto; width: 34px; height: 34px; display: grid; place-items: center; border: 0; background: transparent; color: #555a52; cursor: pointer; }
+.surface { margin: 22px 24px 96px; min-height: 560px; display: flex; flex-direction: column; border: 1px solid #bbb9af; background-color: #f7f5ef; background-image: linear-gradient(#d8d5ca55 1px, transparent 1px), linear-gradient(90deg, #d8d5ca55 1px, transparent 1px); background-size: 24px 24px; box-shadow: 0 12px 30px #34372f12; }
+.surface-heading { display: flex; align-items: end; justify-content: space-between; padding: 26px 30px 20px; border-bottom: 1px solid #c8c5ba; background: #f7f5eff2; }
+.eyebrow { font-family: "Ubuntu Mono", monospace; font-size: 10px; color: #74786f; }
+h1 { margin: 5px 0 0; font-size: 28px; letter-spacing: 0; }
+.surface-id { font-family: "Ubuntu Mono", monospace; font-size: 10px; color: #74786f; }
+.surface-grid { flex: 1; display: grid; grid-template-columns: repeat(12, 1fr); grid-auto-rows: 112px; gap: 16px; padding: 28px 30px; }
+.time-panel { height: 112px; padding: 16px 18px; border: 1px solid #aaa99f; border-left: 4px solid #497d75; background: #fdfcf8; box-shadow: 3px 3px 0 #cac8be; }
+.panel-heading { display: flex; align-items: center; gap: 7px; color: #555b54; font-size: 12px; font-weight: 700; }
+.time-panel time { display: block; margin-top: 8px; font-family: "Ubuntu Mono", monospace; font-size: 25px; font-weight: 500; }
+.time-panel small { color: #777b73; font-size: 10px; }
+.app-icon { height: 100px; align-self: start; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border: 0; background: transparent; cursor: pointer; }
+.app-icon > span { width: 50px; height: 50px; display: grid; place-items: center; color: #f9f7ef; background: #bc5545; box-shadow: 4px 4px 0 #7f3026; }
+.app-icon strong { font-size: 12px; }
+.navigator { margin: 0 30px 24px; height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border: 1px solid #aaa99f; background: #fdfcf8; color: #686c65; font-size: 12px; }
+.navigator kbd { margin-left: auto; font-family: "Ubuntu Mono", monospace; font-size: 10px; }
+.agent-dock { position: fixed; right: 24px; bottom: 20px; left: 24px; height: 62px; display: flex; align-items: center; gap: 12px; padding: 0 12px; color: #f7f5ef; background: #2e322d; box-shadow: 0 9px 24px #17191433; }
+.agent-mark { width: 40px; height: 40px; display: grid; place-items: center; color: #20231f; background: #e4b657; }
+.agent-dock div:nth-child(2) { display: flex; flex-direction: column; }
+.agent-dock strong { font-size: 12px; }
+.agent-dock span { color: #b9beb5; font-size: 11px; }
+.agent-dock button { margin-left: auto; display: flex; align-items: center; gap: 7px; height: 36px; padding: 0 15px; border: 1px solid #f0eee6; color: #f0eee6; background: transparent; cursor: pointer; }
+.status-page { display: grid; place-items: center; font-family: "Ubuntu Mono", monospace; color: #686c65; }
+.status-page.error { color: #9d392e; }
+
+@media (max-width: 900px) {
+  body { min-width: 0; }
+  .surface-grid { grid-template-columns: 1fr; grid-auto-rows: auto; }
+  .time-panel, .app-icon { grid-column: 1 !important; width: 100%; }
+}

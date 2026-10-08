@@ -1,0 +1,10 @@
+{
+  "name": "ui-with-agent",
+  "private": true,
+  "packageManager": "pnpm@12.10.1",
+  "scripts": {
+    "build": "pnpm --filter @ui-with-agent/desktop build",
+    "dev": "pnpm --filter @ui-with-agent/desktop tauri dev",
+    "typecheck": "pnpm --filter @ui-with-agent/desktop typecheck"
+  }
+}
