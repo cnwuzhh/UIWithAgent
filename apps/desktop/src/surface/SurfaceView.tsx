@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, BriefcaseBusiness, Check, Clock3, Grip, Minus, Move, Plus, Search, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, BriefcaseBusiness, Check, Clock3, Grip, Hammer, Minus, Move, Plus, Search, Trash2 } from "lucide-react";
 import type { RuntimeSnapshot, SurfaceElement } from "../contracts";
 
 function TimePanel({ element }: { element: Extract<SurfaceElement, { type: "timePanel" }> }) {
@@ -32,14 +32,18 @@ function AppIcon({ element, editing, onOpenSurface }: {
   editing: boolean;
   onOpenSurface: (surfaceId: string) => void;
 }) {
+  const ready = element.status === "ready" && element.targetSurfaceId;
   return (
     <button
-      className="app-icon"
-      onDoubleClick={() => !editing && onOpenSurface(element.targetSurfaceId)}
-      onKeyDown={(event) => !editing && event.key === "Enter" && onOpenSurface(element.targetSurfaceId)}
+      type="button"
+      className={`app-icon${ready ? "" : " building"}`}
+      aria-disabled={!ready}
+      onDoubleClick={() => !editing && ready && onOpenSurface(ready)}
+      onKeyDown={(event) => !editing && ready && event.key === "Enter" && onOpenSurface(ready)}
     >
-      <span><BriefcaseBusiness size={25} /></span>
+      <span>{ready ? <BriefcaseBusiness size={25} /> : <Hammer size={24} />}</span>
       <strong>{element.title}</strong>
+      {!ready && <small>Agent 正在构建</small>}
     </button>
   );
 }

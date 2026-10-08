@@ -1,14 +1,25 @@
 use agentos_contracts::{
-    BreadcrumbItemDto, ElementDto, GridRectDto, RuntimeSnapshotDto, SurfaceDto, TextRunDto,
+    BreadcrumbItemDto, BuildSubmissionDto, ElementDto, GridRectDto, RuntimeSnapshotDto, SurfaceDto,
+    TextRunDto,
 };
 use agentos_domain::{
-    AppIcon, Element, GridRect, GuiDocument, GuiOperation, OperationTransaction, Surface,
-    SurfaceId, TextPanel, TextRun, TimePanel,
+    AppIcon, AppIconStatus, Element, GridRect, GuiDocument, GuiOperation, OperationTransaction,
+    Surface, SurfaceId, TextPanel, TextRun, TimePanel,
 };
+use std::collections::HashMap;
+
+#[derive(Clone, Debug)]
+pub struct BuildTask {
+    pub id: String,
+    pub surface_id: SurfaceId,
+    pub request: String,
+    pub placeholder_element_id: String,
+}
 
 pub struct Runtime {
     document: GuiDocument,
     current_surface_id: SurfaceId,
+    build_tasks: HashMap<String, BuildTask>,
 }
 
 impl Runtime {
@@ -48,7 +59,9 @@ impl Runtime {
                         Element::AppIcon(AppIcon {
                             id: "app-workspace".into(),
                             title: "工作桌面".into(),
-                            target_surface_id: work_id.clone(),
+                            status: AppIconStatus::Ready,
+                            target_surface_id: Some(work_id.clone()),
+                            build_task_id: None,
                             rect: rect(0, 1, 2, 1),
                         }),
                         Element::TextPanel(TextPanel {
@@ -87,6 +100,7 @@ impl Runtime {
         Self {
             document,
             current_surface_id: desktop_id,
+            build_tasks: HashMap::new(),
         }
     }
 
@@ -164,6 +178,22 @@ impl Runtime {
         element_id: &str,
     ) -> Result<RuntimeSnapshotDto, String> {
         let surface_id = SurfaceId::new(surface_id).map_err(|error| error.to_string())?;
+        let is_build_placeholder = self
+            .document
+            .surface(&surface_id)
+            .map_err(|error| error.to_string())?
+            .elements
+            .iter()
+            .any(|element| {
+                matches!(
+                    element,
+                    Element::AppIcon(icon)
+                        if icon.id == element_id && icon.status == AppIconStatus::Building
+                )
+            });
+        if is_build_placeholder {
+            return Err("building placeholder must be removed by cancelling its task".into());
+        }
         self.document = self
             .document
             .apply_transaction(&OperationTransaction {
@@ -175,6 +205,56 @@ impl Runtime {
             .map_err(|error| error.to_string())?
             .document;
         self.snapshot_for(&self.current_surface_id)
+    }
+
+    pub fn submit_build(
+        &mut self,
+        surface_id: &str,
+        request: &str,
+    ) -> Result<BuildSubmissionDto, String> {
+        let request = request.trim();
+        if request.is_empty() {
+            return Err("build request cannot be empty".into());
+        }
+
+        let surface_id = SurfaceId::new(surface_id).map_err(|error| error.to_string())?;
+        if surface_id != self.current_surface_id {
+            return Err("build request surface must be the current surface".into());
+        }
+        let build_task_id = format!("build-{}", self.document.revision());
+        let placeholder_element_id = format!("build-placeholder-{}", self.document.revision());
+        let outcome = self
+            .document
+            .apply_transaction(&OperationTransaction {
+                operations: vec![GuiOperation::AddElementAuto {
+                    surface_id: surface_id.clone(),
+                    element: Element::AppIcon(AppIcon {
+                        id: placeholder_element_id.clone(),
+                        title: "新应用 · 构建中".into(),
+                        status: AppIconStatus::Building,
+                        target_surface_id: None,
+                        build_task_id: Some(build_task_id.clone()),
+                        rect: rect(0, 0, 2, 1),
+                    }),
+                }],
+            })
+            .map_err(|error| error.to_string())?;
+
+        self.document = outcome.document;
+        self.build_tasks.insert(
+            build_task_id.clone(),
+            BuildTask {
+                id: build_task_id,
+                surface_id,
+                request: request.into(),
+                placeholder_element_id,
+            },
+        );
+
+        Ok(BuildSubmissionDto {
+            message: "收到".into(),
+            snapshot: self.snapshot_for(&self.current_surface_id)?,
+        })
     }
 
     fn snapshot_for(&self, surface_id: &SurfaceId) -> Result<RuntimeSnapshotDto, String> {
@@ -225,16 +305,23 @@ impl Runtime {
                 rect: rect_to_dto(panel.rect),
             },
             Element::AppIcon(icon) => {
-                let target = self
-                    .document
-                    .surface(&icon.target_surface_id)
+                let target = icon
+                    .target_surface_id
+                    .as_ref()
+                    .map(|target_surface_id| self.document.surface(target_surface_id))
+                    .transpose()
                     .map_err(|error| error.to_string())?;
                 ElementDto::AppIcon {
                     id: icon.id.clone(),
                     title: icon.title.clone(),
-                    icon: target.icon.clone(),
-                    status: "ready".into(),
-                    target_surface_id: icon.target_surface_id.as_str().into(),
+                    icon: target.map_or_else(|| "hammer".into(), |surface| surface.icon.clone()),
+                    status: match icon.status {
+                        AppIconStatus::Ready => "ready",
+                        AppIconStatus::Building => "building",
+                    }
+                    .into(),
+                    target_surface_id: icon.target_surface_id.as_ref().map(|id| id.as_str().into()),
+                    build_task_id: icon.build_task_id.clone(),
                     rect: rect_to_dto(icon.rect),
                 }
             }
@@ -427,5 +514,71 @@ mod tests {
                     _ => false,
                 })
         );
+    }
+
+    #[test]
+    fn submit_build_records_task_and_adds_building_placeholder() {
+        let mut runtime = Runtime::demo();
+        let submission = runtime
+            .submit_build("surface-desktop", "在当地时间上增加天气")
+            .unwrap();
+
+        assert_eq!(submission.message, "收到");
+        assert_eq!(submission.snapshot.revision, 2);
+        assert_eq!(runtime.build_tasks.len(), 1);
+        let task = runtime.build_tasks.values().next().unwrap();
+        assert_eq!(task.id, "build-1");
+        assert_eq!(task.surface_id.as_str(), "surface-desktop");
+        assert_eq!(task.request, "在当地时间上增加天气");
+        assert_eq!(task.placeholder_element_id, "build-placeholder-1");
+        assert!(submission.snapshot.surface.elements.iter().any(|element| {
+            matches!(
+                element,
+                agentos_contracts::ElementDto::AppIcon {
+                    status,
+                    build_task_id: Some(task_id),
+                    target_surface_id: None,
+                    ..
+                } if status == "building" && task_id == "build-1"
+            )
+        }));
+    }
+
+    #[test]
+    fn submit_build_rejects_empty_request_without_mutating_runtime() {
+        let mut runtime = Runtime::demo();
+
+        assert!(runtime.submit_build("surface-desktop", "  ").is_err());
+        assert_eq!(runtime.snapshot().revision, 1);
+        assert!(runtime.build_tasks.is_empty());
+    }
+
+    #[test]
+    fn submit_build_rejects_non_current_surface_without_mutating_runtime() {
+        let mut runtime = Runtime::demo();
+
+        assert!(
+            runtime
+                .submit_build("surface-work", "创建天气应用")
+                .is_err()
+        );
+        assert_eq!(runtime.snapshot().revision, 1);
+        assert!(runtime.build_tasks.is_empty());
+    }
+
+    #[test]
+    fn building_placeholder_cannot_be_removed_as_a_regular_element() {
+        let mut runtime = Runtime::demo();
+        runtime
+            .submit_build("surface-desktop", "创建天气应用")
+            .unwrap();
+
+        assert!(
+            runtime
+                .remove_element("surface-desktop", "build-placeholder-1")
+                .is_err()
+        );
+        assert_eq!(runtime.snapshot().revision, 2);
+        assert_eq!(runtime.build_tasks.len(), 1);
     }
 }

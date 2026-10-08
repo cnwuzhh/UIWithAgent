@@ -20,8 +20,9 @@ const appIconSchema = z.object({
   id: z.string(),
   title: z.string(),
   icon: z.string(),
-  status: z.string(),
-  targetSurfaceId: z.string(),
+  status: z.enum(["ready", "building"]),
+  targetSurfaceId: z.string().optional(),
+  buildTaskId: z.string().optional(),
   rect: gridRectSchema,
 });
 
@@ -50,5 +51,11 @@ export const runtimeSnapshotSchema = z.object({
   }),
 });
 
+export const buildSubmissionSchema = z.object({
+  message: z.string(),
+  snapshot: runtimeSnapshotSchema,
+});
+
 export type RuntimeSnapshot = z.infer<typeof runtimeSnapshotSchema>;
 export type SurfaceElement = RuntimeSnapshot["surface"]["elements"][number];
+export type BuildSubmission = z.infer<typeof buildSubmissionSchema>;

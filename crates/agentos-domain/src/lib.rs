@@ -108,8 +108,16 @@ pub struct TimePanel {
 pub struct AppIcon {
     pub id: String,
     pub title: String,
-    pub target_surface_id: SurfaceId,
+    pub status: AppIconStatus,
+    pub target_surface_id: Option<SurfaceId>,
+    pub build_task_id: Option<String>,
     pub rect: GridRect,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum AppIconStatus {
+    Ready,
+    Building,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -522,7 +530,26 @@ impl GuiDocument {
                 }
 
                 match element {
-                    Element::AppIcon(icon) => self.validate_target(&icon.target_surface_id)?,
+                    Element::AppIcon(icon) => match icon.status {
+                        AppIconStatus::Ready => {
+                            match (&icon.target_surface_id, &icon.build_task_id) {
+                                (Some(target_surface_id), None) => {
+                                    self.validate_target(target_surface_id)?
+                                }
+                                _ => return Err(DomainError::InvalidAppIconState(icon.id.clone())),
+                            }
+                        }
+                        AppIconStatus::Building => {
+                            if icon.target_surface_id.is_some()
+                                || icon
+                                    .build_task_id
+                                    .as_ref()
+                                    .is_none_or(|id| id.trim().is_empty())
+                            {
+                                return Err(DomainError::InvalidAppIconState(icon.id.clone()));
+                            }
+                        }
+                    },
                     Element::TextPanel(panel) => {
                         for run in &panel.runs {
                             if let TextRun::SurfaceLink {
@@ -578,6 +605,7 @@ pub enum DomainError {
     EmptyTransaction,
     EmptySurfaceId,
     InvalidRect,
+    InvalidAppIconState(String),
     InvalidSurfaceBounds(SurfaceId),
     MissingParent(SurfaceId),
     MissingTarget(SurfaceId),
@@ -601,6 +629,7 @@ impl fmt::Display for DomainError {
             Self::EmptyTransaction => formatter.write_str("operation transaction cannot be empty"),
             Self::EmptySurfaceId => formatter.write_str("surface id cannot be empty"),
             Self::InvalidRect => formatter.write_str("rect width and height must be positive"),
+            Self::InvalidAppIconState(id) => write!(formatter, "invalid app icon state: {id}"),
             Self::InvalidSurfaceBounds(id) => {
                 write!(
                     formatter,
@@ -626,8 +655,8 @@ impl std::error::Error for DomainError {}
 #[cfg(test)]
 mod tests {
     use super::{
-        Element, GridRect, GuiDocument, GuiOperation, OperationTransaction, Surface, SurfaceId,
-        TextPanel, TextRun, TimePanel,
+        AppIcon, AppIconStatus, Element, GridRect, GuiDocument, GuiOperation, OperationTransaction,
+        Surface, SurfaceId, TextPanel, TextRun, TimePanel,
     };
 
     fn surface(id: &str, parent_id: Option<&str>) -> Surface {
@@ -689,6 +718,31 @@ mod tests {
         let result = GuiDocument::new(1, SurfaceId::new("desktop").unwrap(), vec![desktop]);
 
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn validates_app_icon_state_references() {
+        let mut invalid = surface("desktop", None);
+        invalid.elements.push(Element::AppIcon(AppIcon {
+            id: "invalid-ready".into(),
+            title: "Invalid".into(),
+            status: AppIconStatus::Ready,
+            target_surface_id: None,
+            build_task_id: None,
+            rect: GridRect::new(0, 0, 2, 1).unwrap(),
+        }));
+        assert!(GuiDocument::new(1, SurfaceId::new("desktop").unwrap(), vec![invalid],).is_err());
+
+        let mut valid = surface("desktop", None);
+        valid.elements.push(Element::AppIcon(AppIcon {
+            id: "building-app".into(),
+            title: "New app · Building".into(),
+            status: AppIconStatus::Building,
+            target_surface_id: None,
+            build_task_id: Some("build-1".into()),
+            rect: GridRect::new(0, 0, 2, 1).unwrap(),
+        }));
+        assert!(GuiDocument::new(1, SurfaceId::new("desktop").unwrap(), vec![valid],).is_ok());
     }
 
     #[test]

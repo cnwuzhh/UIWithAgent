@@ -38,7 +38,7 @@ Agent 只能通过受 capability 限制的系统 API 使用 Surface、构建任�
 
 ## 工程基线
 
-首次构建已经建立 React 19、Tauri 2 与 Rust workspace，并打通只读 Runtime snapshot IPC：
+工程已经建立 React 19、Tauri 2 与 Rust workspace，并打通 Rust authoritative Runtime IPC：
 
 ```text
 apps/desktop                 React Shell 与 Tauri bootstrap
@@ -55,4 +55,4 @@ just test
 just dev
 ```
 
-当前窗口展示桌面 breadcrumb、三个时区面板、Surface 入口与 Agent 构建入口。权威写入、SQLite 和 Agent Worker 将按总体架构的后续阶段接入。
+当前窗口展示桌面 breadcrumb、时区面板、Surface 入口与 Agent 构建入口。用户提交需求后，Agent Stub 固定回复“收到”，Rust Runtime 创建内存 BuildTask，并在当前 Surface 原子添加“构建中”占位图标。任务详情、取消、SQLite 和真实 Agent Worker 将按后续小切片接入。

@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { runtimeSnapshotSchema, type RuntimeSnapshot } from "../contracts";
+import { buildSubmissionSchema, runtimeSnapshotSchema, type BuildSubmission, type RuntimeSnapshot } from "../contracts";
 
 export async function getRuntimeSnapshot(): Promise<RuntimeSnapshot> {
   const response = await invoke<unknown>("get_runtime_snapshot");
@@ -43,6 +43,11 @@ export async function addTimePanel(
 export async function removeElement(surfaceId: string, elementId: string): Promise<RuntimeSnapshot> {
   const response = await invoke<unknown>("remove_element", { surfaceId, elementId });
   return runtimeSnapshotSchema.parse(response);
+}
+
+export async function submitBuild(surfaceId: string, request: string): Promise<BuildSubmission> {
+  const response = await invoke<unknown>("submit_build", { surfaceId, request });
+  return buildSubmissionSchema.parse(response);
 }
 
 export async function toggleFullscreen(): Promise<boolean> {

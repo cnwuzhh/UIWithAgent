@@ -11,6 +11,13 @@ pub struct RuntimeSnapshotDto {
 
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct BuildSubmissionDto {
+    pub message: String,
+    pub snapshot: RuntimeSnapshotDto,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct BreadcrumbItemDto {
     pub surface_id: String,
     pub title: String,
@@ -54,7 +61,10 @@ pub enum ElementDto {
         title: String,
         icon: String,
         status: String,
-        target_surface_id: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        target_surface_id: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        build_task_id: Option<String>,
         rect: GridRectDto,
     },
     TextPanel {
@@ -93,7 +103,8 @@ mod tests {
             title: "Work".into(),
             icon: "briefcase".into(),
             status: "ready".into(),
-            target_surface_id: "surface-work".into(),
+            target_surface_id: Some("surface-work".into()),
+            build_task_id: None,
             rect: GridRectDto {
                 x: 0,
                 y: 1,

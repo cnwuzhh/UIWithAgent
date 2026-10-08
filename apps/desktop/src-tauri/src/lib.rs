@@ -1,4 +1,4 @@
-use agentos_contracts::RuntimeSnapshotDto;
+use agentos_contracts::{BuildSubmissionDto, RuntimeSnapshotDto};
 use std::sync::Mutex;
 use tauri::{State, Window};
 
@@ -74,6 +74,18 @@ fn remove_element(
 }
 
 #[tauri::command]
+fn submit_build(
+    surface_id: String,
+    request: String,
+    runtime: State<'_, Mutex<agentos_application::Runtime>>,
+) -> Result<BuildSubmissionDto, String> {
+    runtime
+        .lock()
+        .map_err(|_| "runtime lock poisoned".to_string())?
+        .submit_build(&surface_id, &request)
+}
+
+#[tauri::command]
 fn is_fullscreen(window: Window) -> Result<bool, String> {
     window.is_fullscreen().map_err(|error| error.to_string())
 }
@@ -99,6 +111,7 @@ pub fn run() {
             resize_element,
             add_time_panel,
             remove_element,
+            submit_build,
             is_fullscreen,
             toggle_fullscreen
         ])

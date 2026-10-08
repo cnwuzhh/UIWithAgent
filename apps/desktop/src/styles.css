@@ -44,6 +44,9 @@ h1 { margin: 5px 0 0; font-size: 28px; letter-spacing: 0; }
 .app-icon { height: 100px; align-self: start; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border: 0; background: transparent; cursor: pointer; }
 .app-icon > span { width: 50px; height: 50px; display: grid; place-items: center; color: #f9f7ef; background: #bc5545; box-shadow: 4px 4px 0 #7f3026; }
 .app-icon strong { font-size: 12px; }
+.app-icon small { color: #777b73; font-size: 10px; }
+.app-icon.building { cursor: default; }
+.app-icon.building > span { color: #20231f; background: #e4b657; box-shadow: 4px 4px 0 #917126; }
 .text-panel { min-height: 112px; padding: 17px 20px; border-left: 4px solid #d5a33f; background: #fdfcf8; box-shadow: 3px 3px 0 #cac8be; }
 .text-panel h2 { margin: 0 0 10px; font-size: 14px; }
 .text-panel p { margin: 0; color: #555b54; font-size: 13px; line-height: 1.65; }
@@ -68,12 +71,21 @@ h1 { margin: 5px 0 0; font-size: 28px; letter-spacing: 0; }
 }
 .navigator { margin: 0 30px 24px; height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border: 1px solid #aaa99f; background: #fdfcf8; color: #686c65; font-size: 12px; }
 .navigator kbd { margin-left: auto; font-family: "Ubuntu Mono", monospace; font-size: 10px; }
-.agent-dock { position: fixed; right: 24px; bottom: 20px; left: 24px; height: 62px; display: flex; align-items: center; gap: 12px; padding: 0 12px; color: #f7f5ef; background: #2e322d; box-shadow: 0 9px 24px #17191433; }
+.agent-dock { position: fixed; right: 24px; bottom: 20px; left: 24px; z-index: 10; height: 62px; display: flex; align-items: center; gap: 12px; padding: 0 12px; color: #f7f5ef; background: #2e322d; box-shadow: 0 9px 24px #17191433; }
+.agent-dock.expanded { min-height: 196px; height: auto; align-items: flex-start; padding-top: 14px; padding-bottom: 14px; }
 .agent-mark { width: 40px; height: 40px; display: grid; place-items: center; color: #20231f; background: #e4b657; }
-.agent-dock div:nth-child(2) { display: flex; flex-direction: column; }
+.agent-copy { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .agent-dock strong { font-size: 12px; }
 .agent-dock span { color: #b9beb5; font-size: 11px; }
-.agent-dock button { margin-left: auto; display: flex; align-items: center; gap: 7px; height: 36px; padding: 0 15px; border: 1px solid #f0eee6; color: #f0eee6; background: transparent; cursor: pointer; }
+.builder-toggle, .agent-builder-form button { margin-left: auto; display: flex; align-items: center; justify-content: center; gap: 7px; height: 36px; padding: 0 15px; border: 1px solid #f0eee6; color: #f0eee6; background: transparent; white-space: nowrap; cursor: pointer; }
+.agent-builder-form { max-width: 760px; margin-top: 13px; display: grid; grid-template-columns: 1fr; gap: 6px; }
+.agent-builder-form label { font-size: 11px; font-weight: 700; }
+.agent-builder-form textarea { width: 100%; resize: vertical; min-height: 58px; padding: 9px 10px; border: 1px solid #777c74; border-radius: 0; color: #20231f; background: #f7f5ef; font: 12px/1.5 "Ubuntu", "Noto Sans", sans-serif; }
+.agent-builder-form textarea:focus { border-color: #e4b657; outline: 2px solid #e4b65755; }
+.agent-builder-status { min-height: 36px; display: flex; align-items: center; gap: 10px; }
+.agent-builder-status .agent-reply { display: flex; align-items: center; gap: 5px; color: #e4b657; font-weight: 700; }
+.agent-builder-status .agent-build-error { color: #ffb2a7; }
+.agent-builder-form button:disabled { color: #8e938b; border-color: #62665f; cursor: default; }
 .status-page { display: grid; place-items: center; font-family: "Ubuntu Mono", monospace; color: #686c65; }
 .status-page.error { color: #9d392e; }
 
@@ -87,4 +99,9 @@ h1 { margin: 5px 0 0; font-size: 28px; letter-spacing: 0; }
   .surface-grid { padding-right: 20px; padding-left: 20px; }
   .surface-grid { grid-template-columns: 1fr !important; grid-template-rows: none !important; grid-auto-rows: auto; }
   .element-frame { grid-column: 1 !important; grid-row: auto !important; min-height: 112px; }
+  .agent-dock { right: 12px; bottom: 12px; left: 12px; }
+  .agent-dock.expanded { display: grid; grid-template-columns: 40px 1fr auto; }
+  .agent-builder-form { grid-column: 1 / -1; }
+  .agent-builder-status { align-items: stretch; flex-direction: column; }
+  .agent-builder-form button { width: 100%; }
 }
