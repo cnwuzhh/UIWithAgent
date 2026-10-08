@@ -35,6 +35,20 @@ fn reposition_element(
 }
 
 #[tauri::command]
+fn resize_element(
+    surface_id: String,
+    element_id: String,
+    width: u8,
+    height: u8,
+    runtime: State<'_, Mutex<agentos_application::Runtime>>,
+) -> Result<RuntimeSnapshotDto, String> {
+    runtime
+        .lock()
+        .map_err(|_| "runtime lock poisoned".to_string())?
+        .resize_element(&surface_id, &element_id, width, height)
+}
+
+#[tauri::command]
 fn is_fullscreen(window: Window) -> Result<bool, String> {
     window.is_fullscreen().map_err(|error| error.to_string())
 }
@@ -57,6 +71,7 @@ pub fn run() {
             get_runtime_snapshot,
             open_surface,
             reposition_element,
+            resize_element,
             is_fullscreen,
             toggle_fullscreen
         ])

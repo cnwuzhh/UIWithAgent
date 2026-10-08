@@ -216,6 +216,39 @@ impl GuiDocument {
         Ok(document)
     }
 
+    pub fn resize_element(
+        &self,
+        surface_id: &SurfaceId,
+        element_id: &str,
+        width: u8,
+        height: u8,
+    ) -> Result<Self, DomainError> {
+        let surface = self.surface(surface_id)?;
+        let element = surface
+            .elements
+            .iter()
+            .find(|element| element.id() == element_id)
+            .ok_or_else(|| DomainError::ElementNotFound(element_id.into()))?;
+        let current = element.rect();
+        let candidate = GridRect::new(current.x, current.y, width, height)?;
+        Self::validate_element_rect(surface, element_id, candidate)?;
+
+        let mut document = self.clone();
+        let element = document
+            .surfaces
+            .get_mut(surface_id)
+            .and_then(|surface| {
+                surface
+                    .elements
+                    .iter_mut()
+                    .find(|element| element.id() == element_id)
+            })
+            .ok_or_else(|| DomainError::ElementNotFound(element_id.into()))?;
+        element.set_rect(candidate);
+        document.revision += 1;
+        Ok(document)
+    }
+
     fn validate(&self) -> Result<(), DomainError> {
         let root = self.surface(&self.root_surface_id)?;
         if root.parent_id.is_some() {
@@ -470,6 +503,48 @@ mod tests {
 
         assert!(document.reposition_element(&id, "left", 4, 0).is_err());
         assert!(document.reposition_element(&id, "left", 10, 0).is_err());
+    }
+
+    #[test]
+    fn resize_is_immutable_and_increments_revision() {
+        let mut desktop = surface("desktop", None);
+        desktop.elements.push(Element::TimePanel(TimePanel {
+            id: "clock".into(),
+            title: "Clock".into(),
+            timezone: "local".into(),
+            rect: GridRect::new(0, 0, 2, 1).unwrap(),
+        }));
+        let document =
+            GuiDocument::new(1, SurfaceId::new("desktop").unwrap(), vec![desktop]).unwrap();
+        let id = SurfaceId::new("desktop").unwrap();
+
+        let resized = document.resize_element(&id, "clock", 4, 2).unwrap();
+
+        assert_eq!(document.surface(&id).unwrap().elements[0].rect().width, 2);
+        assert_eq!(resized.revision(), 2);
+        assert_eq!(resized.surface(&id).unwrap().elements[0].rect().width, 4);
+        assert_eq!(resized.surface(&id).unwrap().elements[0].rect().height, 2);
+    }
+
+    #[test]
+    fn resize_rejects_zero_collision_and_out_of_bounds() {
+        let mut desktop = surface("desktop", None);
+        for (id, x) in [("left", 0), ("right", 4)] {
+            desktop.elements.push(Element::TimePanel(TimePanel {
+                id: id.into(),
+                title: id.into(),
+                timezone: "local".into(),
+                rect: GridRect::new(x, 0, 2, 1).unwrap(),
+            }));
+        }
+        let document =
+            GuiDocument::new(1, SurfaceId::new("desktop").unwrap(), vec![desktop]).unwrap();
+        let id = SurfaceId::new("desktop").unwrap();
+
+        assert!(document.resize_element(&id, "left", 0, 1).is_err());
+        assert!(document.resize_element(&id, "left", 5, 1).is_err());
+        assert!(document.resize_element(&id, "right", 9, 1).is_err());
+        assert_eq!(document.revision(), 1);
     }
 
     #[test]

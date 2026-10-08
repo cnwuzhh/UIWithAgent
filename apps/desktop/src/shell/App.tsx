@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Bot, ChevronRight, Command, LayoutDashboard, Maximize2, Minimize2, Plus, Search } from "lucide-react";
 import type { RuntimeSnapshot } from "../contracts";
-import { getRuntimeSnapshot, isFullscreen, openSurface, repositionElement, toggleFullscreen } from "../ipc/client";
+import { getRuntimeSnapshot, isFullscreen, openSurface, repositionElement, resizeElement, toggleFullscreen } from "../ipc/client";
 import { SurfaceView } from "../surface/SurfaceView";
 
 type LoadState =
@@ -43,6 +43,17 @@ export function App() {
       return undefined;
     } catch (error: unknown) {
       return error instanceof Error ? error.message : "无法移动元素";
+    }
+  }
+
+  async function handleResizeElement(elementId: string, width: number, height: number) {
+    if (state.status !== "ready") return "Runtime 暂时不可写";
+    try {
+      const snapshot = await resizeElement(state.snapshot.currentSurfaceId, elementId, width, height);
+      setState({ status: "ready", snapshot });
+      return undefined;
+    } catch (error: unknown) {
+      return error instanceof Error ? error.message : "无法调整元素尺寸";
     }
   }
 
@@ -92,6 +103,7 @@ export function App() {
           surface={state.snapshot.surface}
           onOpenSurface={handleOpenSurface}
           onRepositionElement={handleRepositionElement}
+          onResizeElement={handleResizeElement}
         />
       )}
 

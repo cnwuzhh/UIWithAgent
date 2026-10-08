@@ -21,6 +21,16 @@ export async function repositionElement(
   return runtimeSnapshotSchema.parse(response);
 }
 
+export async function resizeElement(
+  surfaceId: string,
+  elementId: string,
+  width: number,
+  height: number,
+): Promise<RuntimeSnapshot> {
+  const response = await invoke<unknown>("resize_element", { surfaceId, elementId, width, height });
+  return runtimeSnapshotSchema.parse(response);
+}
+
 export async function toggleFullscreen(): Promise<boolean> {
   return invoke<boolean>("toggle_fullscreen");
 }

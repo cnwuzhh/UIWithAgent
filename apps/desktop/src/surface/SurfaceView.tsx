@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, BriefcaseBusiness, Check, Clock3, Move, Search } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, BriefcaseBusiness, Check, Clock3, Minus, Move, Plus, Search } from "lucide-react";
 import type { RuntimeSnapshot, SurfaceElement } from "../contracts";
 
 function TimePanel({ element }: { element: Extract<SurfaceElement, { type: "timePanel" }> }) {
@@ -59,11 +59,12 @@ function TextPanel({ element, editing, onOpenSurface }: {
   );
 }
 
-function SurfaceElementView({ element, editing, onOpenSurface, onReposition }: {
+function SurfaceElementView({ element, editing, onOpenSurface, onReposition, onResize }: {
   element: SurfaceElement;
   editing: boolean;
   onOpenSurface: (surfaceId: string) => void;
   onReposition: (element: SurfaceElement, deltaX: number, deltaY: number) => void;
+  onResize: (element: SurfaceElement, deltaWidth: number, deltaHeight: number) => void;
 }) {
   const content = (() => {
     switch (element.type) {
@@ -83,21 +84,32 @@ function SurfaceElementView({ element, editing, onOpenSurface, onReposition }: {
     >
       {content}
       {editing && (
-        <div className="move-controls" aria-label={`移动${element.title}`}>
-          <button title="向左移动" aria-label="向左移动" onClick={() => onReposition(element, -1, 0)}><ArrowLeft size={14} /></button>
-          <button title="向上移动" aria-label="向上移动" onClick={() => onReposition(element, 0, -1)}><ArrowUp size={14} /></button>
-          <button title="向下移动" aria-label="向下移动" onClick={() => onReposition(element, 0, 1)}><ArrowDown size={14} /></button>
-          <button title="向右移动" aria-label="向右移动" onClick={() => onReposition(element, 1, 0)}><ArrowRight size={14} /></button>
-        </div>
+        <>
+          <div className="move-controls" aria-label={`移动${element.title}`}>
+            <button title="向左移动" aria-label="向左移动" onClick={() => onReposition(element, -1, 0)}><ArrowLeft size={14} /></button>
+            <button title="向上移动" aria-label="向上移动" onClick={() => onReposition(element, 0, -1)}><ArrowUp size={14} /></button>
+            <button title="向下移动" aria-label="向下移动" onClick={() => onReposition(element, 0, 1)}><ArrowDown size={14} /></button>
+            <button title="向右移动" aria-label="向右移动" onClick={() => onReposition(element, 1, 0)}><ArrowRight size={14} /></button>
+          </div>
+          <div className="resize-controls" aria-label={`调整${element.title}尺寸`}>
+            <span>宽</span>
+            <button title="减少宽度" aria-label="减少宽度" onClick={() => onResize(element, -1, 0)}><Minus size={13} /></button>
+            <button title="增加宽度" aria-label="增加宽度" onClick={() => onResize(element, 1, 0)}><Plus size={13} /></button>
+            <span>高</span>
+            <button title="减少高度" aria-label="减少高度" onClick={() => onResize(element, 0, -1)}><Minus size={13} /></button>
+            <button title="增加高度" aria-label="增加高度" onClick={() => onResize(element, 0, 1)}><Plus size={13} /></button>
+          </div>
+        </>
       )}
     </div>
   );
 }
 
-export function SurfaceView({ surface, onOpenSurface, onRepositionElement }: {
+export function SurfaceView({ surface, onOpenSurface, onRepositionElement, onResizeElement }: {
   surface: RuntimeSnapshot["surface"];
   onOpenSurface: (surfaceId: string) => void;
   onRepositionElement: (elementId: string, x: number, y: number) => Promise<string | undefined>;
+  onResizeElement: (elementId: string, width: number, height: number) => Promise<string | undefined>;
 }) {
   const [editing, setEditing] = useState(false);
   const [layoutError, setLayoutError] = useState<string>();
@@ -110,6 +122,16 @@ export function SurfaceView({ surface, onOpenSurface, onRepositionElement }: {
       return;
     }
     setLayoutError(await onRepositionElement(element.id, x, y));
+  }
+
+  async function resizeElement(element: SurfaceElement, deltaWidth: number, deltaHeight: number) {
+    const width = element.rect.width + deltaWidth;
+    const height = element.rect.height + deltaHeight;
+    if (width < 1 || height < 1) {
+      setLayoutError("元素宽度和高度至少为一个网格单位");
+      return;
+    }
+    setLayoutError(await onResizeElement(element.id, width, height));
   }
 
   return (
@@ -138,6 +160,7 @@ export function SurfaceView({ surface, onOpenSurface, onRepositionElement }: {
             key={element.id}
             onOpenSurface={onOpenSurface}
             onReposition={moveElement}
+            onResize={resizeElement}
           />
         ))}
       </div>

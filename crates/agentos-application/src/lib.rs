@@ -116,6 +116,21 @@ impl Runtime {
         self.snapshot_for(&self.current_surface_id)
     }
 
+    pub fn resize_element(
+        &mut self,
+        surface_id: &str,
+        element_id: &str,
+        width: u8,
+        height: u8,
+    ) -> Result<RuntimeSnapshotDto, String> {
+        let surface_id = SurfaceId::new(surface_id).map_err(|error| error.to_string())?;
+        self.document = self
+            .document
+            .resize_element(&surface_id, element_id, width, height)
+            .map_err(|error| error.to_string())?;
+        self.snapshot_for(&self.current_surface_id)
+    }
+
     fn snapshot_for(&self, surface_id: &SurfaceId) -> Result<RuntimeSnapshotDto, String> {
         let surface = self
             .document
@@ -309,5 +324,29 @@ mod tests {
             })
             .unwrap();
         assert_eq!((rect.x, rect.y), (8, 2));
+    }
+
+    #[test]
+    fn resize_returns_incremented_snapshot() {
+        let mut runtime = Runtime::demo();
+        let snapshot = runtime
+            .resize_element("surface-desktop", "app-workspace", 2, 2)
+            .unwrap();
+
+        assert_eq!(snapshot.revision, 2);
+        let rect = snapshot
+            .surface
+            .elements
+            .iter()
+            .find_map(|element| match element {
+                agentos_contracts::ElementDto::AppIcon { id, rect, .. }
+                    if id == "app-workspace" =>
+                {
+                    Some(rect)
+                }
+                _ => None,
+            })
+            .unwrap();
+        assert_eq!((rect.width, rect.height), (2, 2));
     }
 }

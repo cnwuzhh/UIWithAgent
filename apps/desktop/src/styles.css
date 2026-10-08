@@ -50,6 +50,10 @@ h1 { margin: 5px 0 0; font-size: 28px; letter-spacing: 0; }
 .move-controls { position: absolute; top: 5px; right: 5px; z-index: 2; display: grid; grid-template-columns: repeat(2, 28px); gap: 2px; padding: 3px; background: #20231f; box-shadow: 2px 2px 0 #d5a33f; }
 .move-controls button { width: 28px; height: 25px; display: grid; place-items: center; padding: 0; border: 0; color: #f7f5ef; background: transparent; cursor: pointer; }
 .move-controls button:hover, .move-controls button:focus-visible { color: #20231f; background: #e4b657; outline: none; }
+.resize-controls { position: absolute; right: 5px; bottom: 5px; z-index: 2; display: grid; grid-template-columns: 24px 26px 26px; align-items: center; gap: 2px; padding: 3px; color: #f7f5ef; background: #20231f; box-shadow: 2px 2px 0 #497d75; }
+.resize-controls span { font-size: 10px; text-align: center; }
+.resize-controls button { width: 26px; height: 24px; display: grid; place-items: center; padding: 0; border: 0; color: #f7f5ef; background: transparent; cursor: pointer; }
+.resize-controls button:hover, .resize-controls button:focus-visible { color: #20231f; background: #83c97b; outline: none; }
 .navigator { margin: 0 30px 24px; height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border: 1px solid #aaa99f; background: #fdfcf8; color: #686c65; font-size: 12px; }
 .navigator kbd { margin-left: auto; font-family: "Ubuntu Mono", monospace; font-size: 10px; }
 .agent-dock { position: fixed; right: 24px; bottom: 20px; left: 24px; height: 62px; display: flex; align-items: center; gap: 12px; padding: 0 12px; color: #f7f5ef; background: #2e322d; box-shadow: 0 9px 24px #17191433; }
