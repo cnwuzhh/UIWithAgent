@@ -1,6 +1,6 @@
 use agentos_contracts::RuntimeSnapshotDto;
 use std::sync::Mutex;
-use tauri::State;
+use tauri::{State, Window};
 
 #[tauri::command]
 fn get_runtime_snapshot(
@@ -34,6 +34,21 @@ fn reposition_element(
         .reposition_element(&surface_id, &element_id, x, y)
 }
 
+#[tauri::command]
+fn is_fullscreen(window: Window) -> Result<bool, String> {
+    window.is_fullscreen().map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+fn toggle_fullscreen(window: Window) -> Result<bool, String> {
+    let fullscreen = window.is_fullscreen().map_err(|error| error.to_string())?;
+    let next = !fullscreen;
+    window
+        .set_fullscreen(next)
+        .map_err(|error| error.to_string())?;
+    Ok(next)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -41,7 +56,9 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_runtime_snapshot,
             open_surface,
-            reposition_element
+            reposition_element,
+            is_fullscreen,
+            toggle_fullscreen
         ])
         .run(tauri::generate_context!())
         .expect("failed to run UI With Agent");

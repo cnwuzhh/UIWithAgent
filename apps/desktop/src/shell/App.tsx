@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Bot, ChevronRight, Command, LayoutDashboard, Plus, Search } from "lucide-react";
+import { Bot, ChevronRight, Command, LayoutDashboard, Maximize2, Minimize2, Plus, Search } from "lucide-react";
 import type { RuntimeSnapshot } from "../contracts";
-import { getRuntimeSnapshot, openSurface, repositionElement } from "../ipc/client";
+import { getRuntimeSnapshot, isFullscreen, openSurface, repositionElement, toggleFullscreen } from "../ipc/client";
 import { SurfaceView } from "../surface/SurfaceView";
 
 type LoadState =
@@ -11,6 +11,7 @@ type LoadState =
 
 export function App() {
   const [state, setState] = useState<LoadState>({ status: "loading" });
+  const [fullscreen, setFullscreen] = useState(true);
 
   useEffect(() => {
     getRuntimeSnapshot()
@@ -19,6 +20,9 @@ export function App() {
         const message = error instanceof Error ? error.message : "Runtime 暂时不可用";
         setState({ status: "failed", message });
       });
+    isFullscreen().then(setFullscreen).catch((error: unknown) => {
+      console.error("Unable to read fullscreen state", error);
+    });
   }, []);
 
   async function handleOpenSurface(surfaceId: string) {
@@ -42,11 +46,29 @@ export function App() {
     }
   }
 
+  async function handleToggleFullscreen() {
+    try {
+      setFullscreen(await toggleFullscreen());
+    } catch (error) {
+      console.error("Unable to toggle fullscreen", error);
+    }
+  }
+
   return (
     <main className="app-shell">
       <header className="titlebar">
         <div className="brand"><Command size={18} /> UI With Agent</div>
-        <div className="system-state"><span /> Runtime connected</div>
+        <div className="titlebar-actions">
+          <div className="system-state"><span /> Runtime connected</div>
+          <button
+            className="fullscreen-toggle"
+            title={fullscreen ? "退出全屏" : "进入全屏"}
+            aria-label={fullscreen ? "退出全屏" : "进入全屏"}
+            onClick={handleToggleFullscreen}
+          >
+            {fullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+          </button>
+        </div>
       </header>
 
       <nav className="breadcrumb" aria-label="当前位置">

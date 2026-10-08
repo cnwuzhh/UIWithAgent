@@ -20,3 +20,11 @@ export async function repositionElement(
   const response = await invoke<unknown>("reposition_element", { surfaceId, elementId, x, y });
   return runtimeSnapshotSchema.parse(response);
 }
+
+export async function toggleFullscreen(): Promise<boolean> {
+  return invoke<boolean>("toggle_fullscreen");
+}
+
+export async function isFullscreen(): Promise<boolean> {
+  return invoke<boolean>("is_fullscreen");
+}

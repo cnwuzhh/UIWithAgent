@@ -11,9 +11,12 @@ button { font: inherit; }
 
 .app-shell { min-height: 100vh; display: grid; grid-template-rows: 48px 52px 1fr; background: #e9e7df; }
 .titlebar { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; color: #f8f7f2; background: #20231f; }
+.titlebar-actions { display: flex; align-items: center; gap: 14px; }
 .brand, .system-state { display: flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 700; }
 .system-state { color: #c9cec5; font-family: "Ubuntu Mono", monospace; font-size: 11px; font-weight: 400; }
 .system-state span { width: 7px; height: 7px; border-radius: 50%; background: #83c97b; box-shadow: 0 0 0 3px #83c97b22; }
+.fullscreen-toggle { width: 30px; height: 30px; display: grid; place-items: center; padding: 0; border: 1px solid #646960; color: #f8f7f2; background: transparent; cursor: pointer; }
+.fullscreen-toggle:hover, .fullscreen-toggle:focus-visible { border-color: #e4b657; color: #e4b657; outline: none; }
 .breadcrumb { display: flex; align-items: center; gap: 4px; padding: 0 24px; border-bottom: 1px solid #cac8bf; background: #f4f2ec; }
 .breadcrumb-item { display: flex; align-items: center; gap: 4px; padding: 6px 4px; border: 0; color: inherit; background: transparent; font-size: 13px; font-weight: 600; cursor: pointer; }
 .breadcrumb-item:hover, .breadcrumb-item:focus-visible { color: #2f6f62; outline: none; }
