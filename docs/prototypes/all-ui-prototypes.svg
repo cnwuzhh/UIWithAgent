@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1680" height="5720" viewBox="0 0 1680 5720">
+  <defs>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#1e2622" flood-opacity="0.12"/>
+    </filter>
+    <style>
+      .title { font: 600 32px Georgia, 'Microsoft YaHei', serif; fill: #202522; }
+      .subtitle { font: 500 14px 'Microsoft YaHei', sans-serif; fill: #737a74; }
+      .section { font: 800 13px 'Microsoft YaHei', sans-serif; fill: #5d655f; letter-spacing: 1px; }
+      .number { font: 700 11px Consolas, monospace; fill: #2f6f62; }
+    </style>
+  </defs>
+
+  <rect width="1680" height="5720" fill="#deded8"/>
+  <rect x="0" y="0" width="1680" height="112" fill="#f4f3ee"/>
+  <text x="40" y="46" class="title">AgentOS · 完整 UI 产品原型</text>
+  <text x="40" y="74" class="subtitle">MVP Surface、Surface Icon、Agent 构建、App Move/Copy、数据策略与本地应用生命周期</text>
+  <text x="1640" y="49" text-anchor="end" class="section">ALL SCREENS · V0.2</text>
+
+  <g transform="translate(40 126)">
+    <text x="0" y="0" class="number">01</text>
+    <text x="34" y="0" class="section">核心 SURFACE 与 AGENT 构建</text>
+    <rect x="0" y="18" width="1600" height="1200" rx="8" fill="#e9e8e2" filter="url(#shadow)"/>
+    <image href="agentos-ui-prototype.svg" x="0" y="18" width="1600" height="1200" preserveAspectRatio="xMidYMid meet"/>
+  </g>
+
+  <path d="M40 1380H1640" stroke="#bfc2bb"/>
+  <g transform="translate(40 1414)">
+    <text x="0" y="0" class="number">02</text>
+    <text x="34" y="0" class="section">APP MOVE / COPY 与数据模式</text>
+    <rect x="0" y="18" width="1600" height="1050" rx="8" fill="#e9e8e2" filter="url(#shadow)"/>
+    <image href="app-move-copy-prototype.svg" x="0" y="18" width="1600" height="1050" preserveAspectRatio="xMidYMid meet"/>
+  </g>
+
+  <path d="M40 2538H1640" stroke="#bfc2bb"/>
+  <g transform="translate(40 2572)">
+    <text x="0" y="0" class="number">03</text>
+    <text x="34" y="0" class="section">本地 APP 授权、启动与返回</text>
+    <rect x="0" y="18" width="1600" height="1080" rx="8" fill="#e9e8e2" filter="url(#shadow)"/>
+    <image href="local-app-launch-prototype.svg" x="0" y="18" width="1600" height="1080" preserveAspectRatio="xMidYMid meet"/>
+  </g>
+
+  <path d="M40 3708H1640" stroke="#bfc2bb"/>
+  <g transform="translate(40 3742)">
+    <text x="0" y="0" class="number">04</text>
+    <text x="34" y="0" class="section">SURFACE ICON 设置与入口继承</text>
+    <rect x="0" y="18" width="1600" height="900" rx="8" fill="#e9e8e2" filter="url(#shadow)"/>
+    <image href="surface-icon-prototype.svg" x="0" y="18" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </g>
+
+  <path d="M40 4716H1640" stroke="#bfc2bb"/>
+  <g transform="translate(40 4750)">
+    <text x="0" y="0" class="number">05</text>
+    <text x="34" y="0" class="section">WIKI 路径与 SURFACE 内嵌文本导航</text>
+    <rect x="0" y="18" width="1600" height="900" rx="8" fill="#e9e8e2" filter="url(#shadow)"/>
+    <image href="wiki-navigation-prototype.svg" x="0" y="18" width="1600" height="900" preserveAspectRatio="xMidYMid meet"/>
+  </g>
+</svg>

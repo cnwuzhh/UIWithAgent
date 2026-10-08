@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#dfe0d9"/></pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#1e2622" flood-opacity=".12"/></filter>
+    <filter id="modalShadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#151a17" flood-opacity=".23"/></filter>
+    <style>
+      .title{font:600 30px Georgia,'Microsoft YaHei',serif;fill:#202522}.subtitle{font:500 13px 'Microsoft YaHei',sans-serif;fill:#737a74}.section{font:800 12px 'Microsoft YaHei',sans-serif;fill:#5d655f;letter-spacing:1px}.brand{font:700 16px Georgia,'Microsoft YaHei',serif;fill:#202522}.nav{font:700 11px 'Microsoft YaHei',sans-serif;fill:#29302c}.micro{font:700 9px 'Microsoft YaHei',sans-serif;fill:#858b85;letter-spacing:1px}.button{font:700 10px 'Microsoft YaHei',sans-serif}.label{font:700 11px 'Microsoft YaHei',sans-serif;fill:#2d342f}.body{font:500 10px 'Microsoft YaHei',sans-serif;fill:#4d554f}.strong{font:700 11px 'Microsoft YaHei',sans-serif;fill:#202522}.modal-title{font:500 21px Georgia,'Microsoft YaHei',serif;fill:#202522}.icon-label{font:700 11px 'Microsoft YaHei',sans-serif;fill:#202522;text-anchor:middle}.icon-meta{font:500 9px 'Microsoft YaHei',sans-serif;fill:#737a74;text-anchor:middle}.id{font:600 9px Consolas,monospace;fill:#737a74}.badge{font:800 9px 'Microsoft YaHei',sans-serif;fill:#2f6f62;letter-spacing:.5px}
+    </style>
+    <symbol id="clockIcon" viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" fill="none" stroke="currentColor" stroke-width="3"/><path d="M32 18v15l10 6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></symbol>
+    <symbol id="globeIcon" viewBox="0 0 64 64"><circle cx="32" cy="32" r="21" fill="none" stroke="currentColor" stroke-width="3"/><path d="M11 32h42M32 11c8 7 12 14 12 21S40 46 32 53M32 11c-8 7-12 14-12 21s4 14 12 21" fill="none" stroke="currentColor" stroke-width="2.5"/></symbol>
+    <symbol id="pinIcon" viewBox="0 0 64 64"><path d="M32 54S48 40 48 25a16 16 0 10-32 0c0 15 16 29 16 29z" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="32" cy="25" r="6" fill="none" stroke="currentColor" stroke-width="3"/></symbol>
+    <symbol id="calendarIcon" viewBox="0 0 64 64"><rect x="12" y="16" width="40" height="36" rx="4" fill="none" stroke="currentColor" stroke-width="3"/><path d="M12 27h40M22 11v10M42 11v10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></symbol>
+  </defs>
+  <rect width="1600" height="900" fill="#e9e8e2"/>
+  <text x="40" y="46" class="title">Surface Icon · 产品交互原型</text>
+  <text x="40" y="72" class="subtitle">图标属于 Surface；所有指向该 Surface 的入口自动读取同一个图标</text>
+  <text x="1560" y="48" text-anchor="end" class="section">SINGLE SOURCE OF TRUTH · V0.2</text>
+
+  <text x="40" y="110" class="section">01 / 为当前 SURFACE 指定图标</text>
+  <g transform="translate(40 128)">
+    <rect width="740" height="720" rx="8" fill="#f7f6f1" stroke="#bfc3bb" filter="url(#shadow)"/>
+    <rect x="1" y="1" width="738" height="52" rx="7" fill="#faf9f5"/><path d="M1 53H739" stroke="#c9ccc4"/>
+    <text x="20" y="32" class="brand">AgentOS</text><text x="370" y="31" class="nav" text-anchor="middle">伦敦时间</text>
+    <g transform="translate(610 10)"><rect width="110" height="32" rx="6" fill="#ecece6" stroke="#d0d3cb"/><use href="#clockIcon" x="10" y="7" width="18" height="18" color="#366b8c"/><text x="68" y="20" class="button" fill="#343b37" text-anchor="middle">Surface 图标</text></g>
+    <rect x="1" y="54" width="738" height="635" fill="#eeeee8"/><rect x="1" y="54" width="738" height="635" fill="url(#grid)"/><text x="20" y="78" class="micro">SURFACE / LONDON-TIME</text>
+    <g transform="translate(67 116)"><rect width="606" height="182" rx="8" fill="#faf9f5" stroke="#c6cac2"/><text x="20" y="30" class="micro">SURFACE IDENTITY</text><use href="#clockIcon" x="22" y="54" width="72" height="72" color="#366b8c"/><text x="116" y="74" class="strong">伦敦时间</text><text x="116" y="95" class="id">surfaceId: london-time</text><text x="116" y="122" class="body">当前图标：clock · 蓝色</text><rect x="462" y="70" width="122" height="34" rx="6" fill="#2f6f62"/><text x="523" y="91" class="button" fill="white" text-anchor="middle">更改图标</text></g>
+    <rect x="1" y="689" width="738" height="30" fill="#f7f6f1"/><circle cx="21" cy="704" r="4" fill="#43836c"/><text x="32" y="708" class="micro">SURFACE 图标已保存</text>
+
+    <g transform="translate(112 335)" filter="url(#modalShadow)">
+      <rect width="516" height="330" rx="8" fill="#faf9f5" stroke="#bfc3bb"/><text x="24" y="27" class="micro">SURFACE APPEARANCE</text><text x="24" y="57" class="modal-title">选择 Surface 图标</text><path d="M0 76H516" stroke="#d3d6ce"/>
+      <text x="24" y="104" class="label">图标</text>
+      <g transform="translate(24 119)"><rect width="92" height="92" rx="7" fill="#edf3f7" stroke="#366b8c" stroke-width="1.6"/><use href="#clockIcon" x="22" y="14" width="48" height="48" color="#366b8c"/><text x="46" y="79" class="button" fill="#366b8c" text-anchor="middle">时钟</text><circle cx="84" cy="8" r="8" fill="#2f6f62"/><path d="M80 8l3 3 5-6" fill="none" stroke="white" stroke-width="1.4"/></g>
+      <g transform="translate(126 119)"><rect width="92" height="92" rx="7" fill="#f7f6f1" stroke="#d0d3cb"/><use href="#globeIcon" x="22" y="14" width="48" height="48" color="#5a665f"/><text x="46" y="79" class="button" fill="#4d554f" text-anchor="middle">地球</text></g>
+      <g transform="translate(228 119)"><rect width="92" height="92" rx="7" fill="#f7f6f1" stroke="#d0d3cb"/><use href="#pinIcon" x="22" y="14" width="48" height="48" color="#b15d3b"/><text x="46" y="79" class="button" fill="#4d554f" text-anchor="middle">地点</text></g>
+      <g transform="translate(330 119)"><rect width="92" height="92" rx="7" fill="#f7f6f1" stroke="#d0d3cb"/><use href="#calendarIcon" x="22" y="14" width="48" height="48" color="#8a6b35"/><text x="46" y="79" class="button" fill="#4d554f" text-anchor="middle">日历</text></g>
+      <text x="24" y="239" class="body">颜色</text><g transform="translate(69 228)"><circle cx="10" cy="10" r="10" fill="#366b8c"/><circle cx="42" cy="10" r="10" fill="#2f6f62"/><circle cx="74" cy="10" r="10" fill="#b15d3b"/><circle cx="106" cy="10" r="10" fill="#8a6b35"/></g>
+      <path d="M0 263H516" stroke="#d3d6ce"/><rect x="338" y="279" width="68" height="32" rx="6" fill="#e9e9e3"/><text x="372" y="299" class="button" fill="#343b37" text-anchor="middle">取消</text><rect x="416" y="279" width="76" height="32" rx="6" fill="#2f6f62"/><text x="454" y="299" class="button" fill="white" text-anchor="middle">保存</text>
+    </g>
+  </g>
+
+  <text x="820" y="110" class="section">02 / 入口 SURFACE 自动使用目标图标</text>
+  <g transform="translate(820 128)">
+    <rect width="740" height="720" rx="8" fill="#f7f6f1" stroke="#bfc3bb" filter="url(#shadow)"/>
+    <rect x="1" y="1" width="738" height="52" rx="7" fill="#faf9f5"/><path d="M1 53H739" stroke="#c9ccc4"/><text x="20" y="32" class="brand">AgentOS</text><text x="370" y="31" class="nav" text-anchor="middle">桌面</text>
+    <rect x="1" y="54" width="738" height="635" fill="#eeeee8"/><rect x="1" y="54" width="738" height="635" fill="url(#grid)"/><text x="20" y="78" class="micro">SURFACE / DESKTOP</text>
+    <g transform="translate(54 116)"><rect width="96" height="96" rx="8" fill="#faf9f5" stroke="#bfc4bc"/><rect y="91" width="96" height="5" fill="#366b8c"/><use href="#clockIcon" x="20" y="17" width="56" height="56" color="#366b8c"/><text x="48" y="119" class="icon-label">伦敦时间</text><text x="48" y="136" class="icon-meta">打开 Surface</text></g>
+    <g transform="translate(190 116)"><rect width="96" height="96" rx="8" fill="#faf9f5" stroke="#bfc4bc"/><rect y="91" width="96" height="5" fill="#b15d3b"/><use href="#pinIcon" x="20" y="17" width="56" height="56" color="#b15d3b"/><text x="48" y="119" class="icon-label">洛杉矶时间</text><text x="48" y="136" class="icon-meta">打开 Surface</text></g>
+    <g transform="translate(54 305)"><rect width="632" height="210" rx="8" fill="#faf9f5" stroke="#c6cac2"/><text x="20" y="28" class="micro">ICON RESOLUTION</text><text x="20" y="59" class="strong">入口图标不可单独编辑</text><text x="20" y="82" class="body">target.kind = surface 时，Renderer 从目标 Surface 读取 icon。</text><path d="M20 102H612" stroke="#e0e2dc"/><text x="20" y="130" class="body">入口 Surface</text><text x="612" y="130" text-anchor="end" class="id">desktop</text><text x="20" y="154" class="body">目标 Surface</text><text x="612" y="154" text-anchor="end" class="id">london-time</text><text x="20" y="178" class="body">显示图标</text><g transform="translate(503 161)"><use href="#clockIcon" width="26" height="26" color="#366b8c"/><text x="109" y="18" text-anchor="end" class="id">Surface.icon</text></g></g>
+    <g transform="translate(54 548)"><rect width="632" height="72" rx="7" fill="#edf5f1" stroke="#bdd2c9"/><text x="18" y="28" class="badge">一致性保证</text><text x="18" y="51" class="body">修改 Surface 图标后，桌面、旅行计划等所有入口同步更新。</text></g>
+    <rect x="1" y="689" width="738" height="30" fill="#f7f6f1"/><circle cx="21" cy="704" r="4" fill="#43836c"/><text x="32" y="708" class="micro">2 个 SURFACE 入口 · 图标来自目标 SURFACE</text>
+  </g>
+</svg>

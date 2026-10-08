@@ -1,0 +1,239 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1200" viewBox="0 0 1600 1200">
+  <defs>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#dfe0d9" stroke-width="1"/>
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#1e2622" flood-opacity="0.12"/>
+    </filter>
+    <filter id="modalShadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#151a17" flood-opacity="0.24"/>
+    </filter>
+    <style>
+      .board-title { font: 600 28px Georgia, 'Microsoft YaHei', serif; fill: #202522; }
+      .board-subtitle { font: 500 13px 'Microsoft YaHei', sans-serif; fill: #737a74; }
+      .frame-label { font: 700 12px 'Microsoft YaHei', sans-serif; fill: #5d655f; letter-spacing: 1px; }
+      .brand { font: 700 17px Georgia, 'Microsoft YaHei', serif; fill: #202522; }
+      .micro { font: 700 9px 'Microsoft YaHei', sans-serif; fill: #858b85; letter-spacing: 1px; }
+      .nav-title { font: 700 12px 'Microsoft YaHei', sans-serif; fill: #29302c; }
+      .button-label { font: 700 11px 'Microsoft YaHei', sans-serif; }
+      .panel-kicker { font: 800 9px 'Microsoft YaHei', sans-serif; fill: #737a74; letter-spacing: 1px; }
+      .panel-title { font: 500 20px Georgia, 'Microsoft YaHei', serif; fill: #202522; }
+      .clock { font: 600 51px Aptos, 'Microsoft YaHei', sans-serif; fill: #202522; font-variant-numeric: tabular-nums; }
+      .date { font: 500 11px 'Microsoft YaHei', sans-serif; fill: #6d746e; }
+      .icon-label { font: 700 11px 'Microsoft YaHei', sans-serif; fill: #202522; text-anchor: middle; }
+      .icon-meta { font: 500 9px 'Microsoft YaHei', sans-serif; fill: #737a74; text-anchor: middle; }
+      .modal-title { font: 500 22px Georgia, 'Microsoft YaHei', serif; fill: #202522; }
+      .body { font: 500 12px 'Microsoft YaHei', sans-serif; fill: #343b37; }
+      .body-strong { font: 700 12px 'Microsoft YaHei', sans-serif; fill: #202522; }
+      .status { font: 800 10px 'Microsoft YaHei', sans-serif; fill: #a56a17; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1200" fill="#e9e8e2"/>
+  <text x="40" y="40" class="board-title">AgentOS · MVP 产品原型</text>
+  <text x="40" y="65" class="board-subtitle">二维 Surface、Time Panel、App Icon 与 Agent 构建入口</text>
+  <text x="1560" y="48" text-anchor="end" class="frame-label">DESIGN REVIEW · V0.1</text>
+
+  <!-- Frame 1: Desktop -->
+  <text x="40" y="92" class="frame-label">01 / 桌面与应用入口</text>
+  <g transform="translate(40 108)">
+    <rect width="740" height="480" rx="8" fill="#f7f6f1" stroke="#bfc3bb" filter="url(#shadow)"/>
+    <rect x="1" y="1" width="738" height="54" rx="7" fill="#f9f8f4"/>
+    <path d="M1 55H739" stroke="#c9ccc4"/>
+    <g transform="translate(20 15)">
+      <rect width="11" height="11" fill="#202522"/><rect x="14" width="11" height="11" fill="#2f6f62"/>
+      <rect y="14" width="11" height="11" fill="#2f6f62"/><rect x="14" y="14" width="11" height="11" fill="#202522"/>
+      <text x="36" y="18" class="brand">AgentOS</text>
+    </g>
+    <text x="370" y="33" class="nav-title" text-anchor="middle">桌面</text>
+    <g transform="translate(410 11)">
+      <rect width="70" height="32" rx="6" fill="#ecece6" stroke="#d4d6cf"/>
+      <path d="M13 16h10M18 11v10M13 16l3-3M13 16l3 3M23 16l-3-3M23 16l-3 3M18 11l-3 3M18 11l3 3M18 21l-3-3M18 21l3-3" fill="none" stroke="#343b37" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="47" y="20" class="button-label" fill="#343b37" text-anchor="middle">移动到</text>
+    </g>
+    <g transform="translate(488 11)">
+      <rect width="70" height="32" rx="6" fill="#ecece6" stroke="#d4d6cf"/>
+      <rect x="12" y="9" width="10" height="11" rx="1" fill="none" stroke="#343b37" stroke-width="1.3"/>
+      <rect x="16" y="13" width="10" height="11" rx="1" fill="#ecece6" stroke="#343b37" stroke-width="1.3"/>
+      <text x="47" y="20" class="button-label" fill="#343b37" text-anchor="middle">复制为</text>
+    </g>
+    <g transform="translate(566 11)">
+      <rect width="76" height="32" rx="6" fill="#f5e8e5" stroke="#e1c6c0"/>
+      <path d="M14 10v13M10 12h8M12 8h4M12 12v9M16 12v9" fill="none" stroke="#a84237" stroke-width="1.4" stroke-linecap="round"/>
+      <text x="50" y="20" class="button-label" fill="#a84237" text-anchor="middle">删除</text>
+    </g>
+    <g transform="translate(650 11)">
+      <rect width="68" height="32" rx="6" fill="#2f6f62"/>
+      <path d="M14 16h10M19 11v10" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
+      <text x="47" y="20" class="button-label" fill="white" text-anchor="middle">构建</text>
+    </g>
+    <rect x="1" y="56" width="738" height="394" fill="#eeeee8"/>
+    <rect x="1" y="56" width="738" height="394" fill="url(#grid)"/>
+    <text x="20" y="78" class="micro">SURFACE / DESKTOP</text>
+    <text x="720" y="78" text-anchor="end" class="micro">12 × 8 GRID</text>
+
+    <g transform="translate(48 101)" filter="url(#shadow)">
+      <rect width="368" height="178" rx="8" fill="#fbfaf6" stroke="#c4c8c0"/>
+      <rect width="368" height="4" rx="2" fill="#2f6f62"/>
+      <text x="22" y="30" class="panel-kicker">LOCAL TIME</text>
+      <circle cx="337" cy="27" r="10" fill="none" stroke="#2f6f62" stroke-width="1.6"/>
+      <path d="M337 21v7l5 3" fill="none" stroke="#2f6f62" stroke-width="1.6" stroke-linecap="round"/>
+      <text x="22" y="61" class="panel-title">当地时间</text>
+      <text x="22" y="116" class="clock">21:36:08</text>
+      <text x="22" y="151" class="date">2026 年 10 月 8 日 · 星期四</text>
+      <text x="346" y="151" text-anchor="end" class="date">Asia/Shanghai</text>
+    </g>
+
+    <g transform="translate(62 328)">
+      <g>
+        <rect x="-8" y="-8" width="82" height="116" rx="8" fill="#f7faf8" stroke="#2f6f62" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <rect x="2" width="62" height="62" rx="8" fill="#faf9f5" stroke="#c3c7bf"/>
+        <rect x="2" y="58" width="62" height="4" fill="#366b8c"/>
+        <circle cx="33" cy="28" r="15" fill="none" stroke="#366b8c" stroke-width="2"/>
+        <path d="M33 18v11l7 4" fill="none" stroke="#366b8c" stroke-width="2" stroke-linecap="round"/>
+        <text x="33" y="82" class="icon-label">伦敦时间</text>
+        <text x="33" y="98" class="icon-meta">打开时钟</text>
+        <circle cx="67" cy="-7" r="8" fill="#2f6f62"/>
+        <path d="M63 -7l3 3 5-6" fill="none" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+      <g transform="translate(105)">
+        <rect x="2" width="62" height="62" rx="8" fill="#faf9f5" stroke="#c3c7bf"/>
+        <rect x="2" y="58" width="62" height="4" fill="#b15d3b"/>
+        <circle cx="33" cy="28" r="15" fill="none" stroke="#b15d3b" stroke-width="2"/>
+        <path d="M33 18v11l7 4" fill="none" stroke="#b15d3b" stroke-width="2" stroke-linecap="round"/>
+        <text x="33" y="82" class="icon-label">洛杉矶时间</text>
+        <text x="33" y="98" class="icon-meta">打开时钟</text>
+      </g>
+      <g transform="translate(210)">
+        <rect x="2" width="62" height="62" rx="8" fill="#fff8e9" stroke="#d8be8e"/>
+        <rect x="2" y="58" width="62" height="4" fill="#b7791f"/>
+        <circle cx="33" cy="28" r="15" fill="none" stroke="#b7791f" stroke-width="2" stroke-dasharray="7 4"/>
+        <path d="M33 13v6M33 37v6M18 28h6M42 28h6" stroke="#b7791f" stroke-width="1.5"/>
+        <text x="33" y="82" class="icon-label">当地天气</text>
+        <text x="33" y="98" class="icon-meta" fill="#a56a17">构建中</text>
+      </g>
+    </g>
+    <rect x="1" y="450" width="738" height="29" fill="#f7f6f1"/>
+    <circle cx="22" cy="465" r="4" fill="#43836c"/>
+    <text x="32" y="469" class="micro">本地运行</text>
+    <text x="718" y="469" text-anchor="end" class="micro">1 个构建任务</text>
+  </g>
+
+  <!-- Frame 2: City -->
+  <text x="820" y="92" class="frame-label">02 / 城市时间 Surface</text>
+  <g transform="translate(820 108)">
+    <rect width="740" height="480" rx="8" fill="#f7f6f1" stroke="#bfc3bb" filter="url(#shadow)"/>
+    <rect x="1" y="1" width="738" height="54" rx="7" fill="#f9f8f4"/>
+    <path d="M1 55H739" stroke="#c9ccc4"/>
+    <g transform="translate(20 15)">
+      <rect width="11" height="11" fill="#202522"/><rect x="14" width="11" height="11" fill="#2f6f62"/>
+      <rect y="14" width="11" height="11" fill="#2f6f62"/><rect x="14" y="14" width="11" height="11" fill="#202522"/>
+      <text x="36" y="18" class="brand">AgentOS</text>
+    </g>
+    <g transform="translate(284 11)">
+      <rect width="32" height="32" rx="6" fill="#ecece6" stroke="#d4d6cf"/>
+      <path d="M20 10l-7 6 7 6M13 16h10" fill="none" stroke="#202522" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <text x="370" y="33" class="nav-title" text-anchor="middle">伦敦时间</text>
+    <g transform="translate(652 11)">
+      <rect width="68" height="32" rx="6" fill="#2f6f62"/>
+      <path d="M14 16h10M19 11v10" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
+      <text x="47" y="20" class="button-label" fill="white" text-anchor="middle">构建</text>
+    </g>
+    <rect x="1" y="56" width="738" height="394" fill="#eeeee8"/>
+    <rect x="1" y="56" width="738" height="394" fill="url(#grid)"/>
+    <text x="20" y="78" class="micro">SURFACE / LONDON</text>
+    <text x="720" y="78" text-anchor="end" class="micro">12 × 8 GRID</text>
+    <g transform="translate(140 142)" filter="url(#shadow)">
+      <rect width="460" height="220" rx="8" fill="#fbfaf6" stroke="#c4c8c0"/>
+      <rect width="460" height="4" rx="2" fill="#366b8c"/>
+      <text x="25" y="33" class="panel-kicker">WORLD CLOCK</text>
+      <circle cx="425" cy="30" r="11" fill="none" stroke="#366b8c" stroke-width="1.7"/>
+      <path d="M425 23v8l6 3" fill="none" stroke="#366b8c" stroke-width="1.7" stroke-linecap="round"/>
+      <text x="25" y="70" class="panel-title">伦敦</text>
+      <text x="25" y="133" class="clock">14:36:08</text>
+      <path d="M25 159H435" stroke="#e0e1dc"/>
+      <text x="25" y="190" class="date">2026 年 10 月 8 日 · 星期四</text>
+      <text x="435" y="190" text-anchor="end" class="date">Europe/London</text>
+    </g>
+    <rect x="1" y="450" width="738" height="29" fill="#f7f6f1"/>
+    <circle cx="22" cy="465" r="4" fill="#43836c"/>
+    <text x="32" y="469" class="micro">本地运行</text>
+    <text x="718" y="469" text-anchor="end" class="micro">没有活动任务</text>
+  </g>
+
+  <!-- Frame 3: Build dialog -->
+  <text x="40" y="637" class="frame-label">03 / Agent 构建入口</text>
+  <g transform="translate(40 653)">
+    <rect width="740" height="507" rx="8" fill="#f7f6f1" stroke="#bfc3bb" filter="url(#shadow)"/>
+    <rect x="1" y="1" width="738" height="54" rx="7" fill="#f9f8f4"/>
+    <path d="M1 55H739" stroke="#c9ccc4"/>
+    <text x="24" y="33" class="brand">AgentOS</text>
+    <text x="370" y="33" class="nav-title" text-anchor="middle">桌面</text>
+    <rect x="1" y="56" width="738" height="450" fill="#252b27" opacity="0.46"/>
+    <rect x="1" y="56" width="738" height="450" fill="url(#grid)" opacity="0.22"/>
+    <g transform="translate(127 92)" filter="url(#modalShadow)">
+      <rect width="486" height="370" rx="8" fill="#faf9f5" stroke="#b9bdb5"/>
+      <text x="24" y="27" class="panel-kicker">AGENT BUILDER</text>
+      <text x="24" y="57" class="modal-title">构建新功能</text>
+      <g transform="translate(438 18)">
+        <rect width="30" height="30" rx="6" fill="#ecece6"/>
+        <path d="M10 10l10 10M20 10L10 20" stroke="#343b37" stroke-width="1.5" stroke-linecap="round"/>
+      </g>
+      <path d="M0 76H486" stroke="#d3d6ce"/>
+      <text x="24" y="107" class="body-strong">描述你希望在当前界面增加的能力</text>
+      <rect x="24" y="122" width="438" height="112" rx="6" fill="white" stroke="#2f6f62" stroke-width="1.5"/>
+      <text x="39" y="151" class="body">在当地时间 Panel 上增加当地天气</text>
+      <rect x="24" y="249" width="119" height="25" rx="4" fill="#f0f0ea" stroke="#d0d3cb"/>
+      <path d="M37 256c-4 0-6 3-6 6 0 5 6 9 6 9s6-4 6-9c0-3-2-6-6-6z" fill="none" stroke="#6d746e" stroke-width="1.2"/>
+      <circle cx="37" cy="262" r="2" fill="#6d746e"/>
+      <text x="50" y="266" class="date">当前上下文：桌面</text>
+      <path d="M0 299H486" stroke="#d3d6ce"/>
+      <rect x="290" y="317" width="72" height="36" rx="6" fill="#e9e9e3"/>
+      <text x="326" y="340" class="button-label" fill="#343b37" text-anchor="middle">取消</text>
+      <rect x="374" y="317" width="88" height="36" rx="6" fill="#2f6f62"/>
+      <path d="M389 328l9 9M398 328l-9 9" stroke="white" stroke-width="1.4" transform="rotate(45 393.5 332.5)"/>
+      <text x="426" y="340" class="button-label" fill="white" text-anchor="middle">开始构建</text>
+    </g>
+  </g>
+
+  <!-- Frame 4: Task dialog -->
+  <text x="820" y="637" class="frame-label">04 / 构建任务详情</text>
+  <g transform="translate(820 653)">
+    <rect width="740" height="507" rx="8" fill="#f7f6f1" stroke="#bfc3bb" filter="url(#shadow)"/>
+    <rect x="1" y="1" width="738" height="54" rx="7" fill="#f9f8f4"/>
+    <path d="M1 55H739" stroke="#c9ccc4"/>
+    <text x="24" y="33" class="brand">AgentOS</text>
+    <text x="370" y="33" class="nav-title" text-anchor="middle">桌面</text>
+    <rect x="1" y="56" width="738" height="450" fill="#252b27" opacity="0.46"/>
+    <rect x="1" y="56" width="738" height="450" fill="url(#grid)" opacity="0.22"/>
+    <g transform="translate(137 84)" filter="url(#modalShadow)">
+      <rect width="466" height="388" rx="8" fill="#faf9f5" stroke="#b9bdb5"/>
+      <text x="24" y="27" class="panel-kicker">BUILD TASK</text>
+      <text x="24" y="57" class="modal-title">当地天气</text>
+      <g transform="translate(418 18)">
+        <rect width="30" height="30" rx="6" fill="#ecece6"/>
+        <path d="M10 10l10 10M20 10L10 20" stroke="#343b37" stroke-width="1.5" stroke-linecap="round"/>
+      </g>
+      <path d="M0 76H466" stroke="#d3d6ce"/>
+      <g transform="translate(24 96)">
+        <circle cx="8" cy="8" r="7" fill="none" stroke="#b7791f" stroke-width="1.5" stroke-dasharray="4 2"/>
+        <text x="24" y="12" class="status">构建中</text>
+      </g>
+      <rect x="24" y="134" width="3" height="61" fill="#bfc3bb"/>
+      <text x="40" y="149" class="panel-kicker">需求</text>
+      <text x="40" y="175" class="body">在当地时间 Panel 上增加当地天气</text>
+      <rect x="24" y="215" width="418" height="66" rx="6" fill="#edf5f1" stroke="#bdd2c9"/>
+      <circle cx="50" cy="248" r="12" fill="#2f6f62"/>
+      <path d="M44 248l4 4 8-9" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="72" y="239" class="panel-kicker">AGENT</text>
+      <text x="72" y="261" class="body-strong" fill="#24584e">收到</text>
+      <text x="24" y="309" class="date">创建于 2026-10-08 21:36</text>
+      <path d="M0 326H466" stroke="#d3d6ce"/>
+      <rect x="344" y="342" width="98" height="34" rx="6" fill="#f5e8e5"/>
+      <path d="M361 351v15M356 354h10M359 349h4" fill="none" stroke="#a84237" stroke-width="1.4" stroke-linecap="round"/>
+      <text x="405" y="364" class="button-label" fill="#a84237" text-anchor="middle">取消构建</text>
+    </g>
+  </g>
+</svg>

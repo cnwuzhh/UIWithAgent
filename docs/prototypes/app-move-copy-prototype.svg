@@ -1,0 +1,265 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1050" viewBox="0 0 1600 1050">
+  <defs>
+    <pattern id="grid" width="22" height="22" patternUnits="userSpaceOnUse">
+      <path d="M22 0H0V22" fill="none" stroke="#dfe0d9" stroke-width="1"/>
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="11" flood-color="#1e2622" flood-opacity="0.12"/>
+    </filter>
+    <filter id="modalShadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="15" stdDeviation="18" flood-color="#151a17" flood-opacity="0.22"/>
+    </filter>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#717971"/>
+    </marker>
+    <style>
+      .title { font: 600 30px Georgia, 'Microsoft YaHei', serif; fill: #202522; }
+      .subtitle { font: 500 13px 'Microsoft YaHei', sans-serif; fill: #737a74; }
+      .section { font: 800 12px 'Microsoft YaHei', sans-serif; fill: #5d655f; letter-spacing: 1px; }
+      .brand { font: 700 16px Georgia, 'Microsoft YaHei', serif; fill: #202522; }
+      .nav { font: 700 11px 'Microsoft YaHei', sans-serif; fill: #29302c; }
+      .micro { font: 700 9px 'Microsoft YaHei', sans-serif; fill: #858b85; letter-spacing: 1px; }
+      .button { font: 700 10px 'Microsoft YaHei', sans-serif; }
+      .icon-label { font: 700 10px 'Microsoft YaHei', sans-serif; fill: #202522; text-anchor: middle; }
+      .icon-meta { font: 500 8px 'Microsoft YaHei', sans-serif; fill: #737a74; text-anchor: middle; }
+      .modal-title { font: 500 20px Georgia, 'Microsoft YaHei', serif; fill: #202522; }
+      .label { font: 700 11px 'Microsoft YaHei', sans-serif; fill: #2d342f; }
+      .body { font: 500 10px 'Microsoft YaHei', sans-serif; fill: #4d554f; }
+      .strong { font: 700 11px 'Microsoft YaHei', sans-serif; fill: #202522; }
+      .id { font: 600 8px Consolas, monospace; fill: #737a74; }
+      .result-title { font: 700 13px 'Microsoft YaHei', sans-serif; fill: #202522; }
+      .result-note { font: 500 10px 'Microsoft YaHei', sans-serif; fill: #66706a; }
+      .badge { font: 800 9px 'Microsoft YaHei', sans-serif; letter-spacing: .5px; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1050" fill="#e9e8e2"/>
+  <text x="40" y="46" class="title">App Move / Copy · 产品交互原型</text>
+  <text x="40" y="72" class="subtitle">Move 迁移同一个 App 的入口；Copy 创建具有全新 ID、Surface 和数据的独立 App</text>
+  <text x="1560" y="48" text-anchor="end" class="section">DESIGN REVIEW · V0.1</text>
+
+  <!-- Source -->
+  <text x="40" y="112" class="section">01 / 选择当前 APP</text>
+  <g transform="translate(40 130)">
+    <rect width="460" height="820" rx="8" fill="#f7f6f1" stroke="#bfc3bb" filter="url(#shadow)"/>
+    <rect x="1" y="1" width="458" height="52" rx="7" fill="#faf9f5"/>
+    <path d="M1 53H459" stroke="#c9ccc4"/>
+    <g transform="translate(18 14)">
+      <rect width="10" height="10" fill="#202522"/><rect x="13" width="10" height="10" fill="#2f6f62"/>
+      <rect y="13" width="10" height="10" fill="#2f6f62"/><rect x="13" y="13" width="10" height="10" fill="#202522"/>
+      <text x="33" y="17" class="brand">AgentOS</text>
+    </g>
+    <text x="230" y="31" text-anchor="middle" class="nav">世界时钟</text>
+    <rect x="1" y="54" width="458" height="735" fill="#eeeee8"/>
+    <rect x="1" y="54" width="458" height="735" fill="url(#grid)"/>
+    <text x="18" y="78" class="micro">SURFACE / WORLD-CLOCK</text>
+
+    <g transform="translate(45 116)">
+      <g>
+        <rect x="-9" y="-9" width="102" height="142" rx="8" fill="#f7faf8" stroke="#2f6f62" stroke-width="1.7" stroke-dasharray="5 3"/>
+        <rect width="84" height="84" rx="8" fill="#faf9f5" stroke="#bfc4bc"/>
+        <rect y="79" width="84" height="5" fill="#366b8c"/>
+        <circle cx="42" cy="38" r="20" fill="none" stroke="#366b8c" stroke-width="2.4"/>
+        <path d="M42 24v15l10 6" fill="none" stroke="#366b8c" stroke-width="2.4" stroke-linecap="round"/>
+        <text x="42" y="105" class="icon-label">伦敦时间</text>
+        <text x="42" y="121" class="icon-meta">当前 App</text>
+        <circle cx="86" cy="-8" r="9" fill="#2f6f62"/>
+        <path d="M82 -8l3 3 6-7" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+      <g transform="translate(140)">
+        <rect width="84" height="84" rx="8" fill="#faf9f5" stroke="#bfc4bc"/>
+        <rect y="79" width="84" height="5" fill="#b15d3b"/>
+        <circle cx="42" cy="38" r="20" fill="none" stroke="#b15d3b" stroke-width="2.4"/>
+        <path d="M42 24v15l10 6" fill="none" stroke="#b15d3b" stroke-width="2.4" stroke-linecap="round"/>
+        <text x="42" y="105" class="icon-label">洛杉矶时间</text>
+        <text x="42" y="121" class="icon-meta">App 入口</text>
+      </g>
+    </g>
+
+    <g transform="translate(25 318)">
+      <rect width="410" height="146" rx="8" fill="#faf9f5" stroke="#c6cac2"/>
+      <text x="18" y="27" class="micro">SELECTED APP</text>
+      <text x="18" y="52" class="result-title">伦敦时间</text>
+      <text x="18" y="71" class="id">appSurfaceId: london-time</text>
+      <path d="M18 86H392" stroke="#e0e2dc"/>
+      <text x="18" y="108" class="body">来源入口</text>
+      <text x="392" y="108" text-anchor="end" class="id">world-clock / london-icon</text>
+      <text x="18" y="128" class="body">App 数据</text>
+      <text x="392" y="128" text-anchor="end" class="body">1 Surface · 1 Time Panel</text>
+    </g>
+
+    <g transform="translate(25 493)">
+      <rect width="410" height="62" rx="7" fill="#f1f1eb" stroke="#d2d5cd"/>
+      <g transform="translate(17 15)">
+        <rect width="112" height="32" rx="6" fill="#ecece6" stroke="#d0d3cb"/>
+        <path d="M13 16h10M18 11v10" stroke="#343b37" stroke-width="1.3"/>
+        <text x="74" y="20" class="button" fill="#343b37" text-anchor="middle">移动到</text>
+      </g>
+      <g transform="translate(140 15)">
+        <rect width="112" height="32" rx="6" fill="#ecece6" stroke="#d0d3cb"/>
+        <rect x="13" y="9" width="10" height="11" fill="none" stroke="#343b37" stroke-width="1.3"/>
+        <rect x="17" y="13" width="10" height="11" fill="#ecece6" stroke="#343b37" stroke-width="1.3"/>
+        <text x="74" y="20" class="button" fill="#343b37" text-anchor="middle">复制为</text>
+      </g>
+      <g transform="translate(263 15)">
+        <rect width="130" height="32" rx="6" fill="#f5e8e5" stroke="#e1c6c0"/>
+        <text x="65" y="20" class="button" fill="#a84237" text-anchor="middle">删除入口</text>
+      </g>
+    </g>
+
+    <g transform="translate(25 588)">
+      <rect width="410" height="150" rx="8" fill="#edf5f1" stroke="#bdd2c9"/>
+      <text x="18" y="29" class="micro" fill="#2f6f62">OPERATION SCOPE</text>
+      <text x="18" y="56" class="strong">Move</text>
+      <text x="72" y="56" class="body">同一个 App，只迁移入口</text>
+      <text x="18" y="83" class="strong">Copy</text>
+      <text x="72" y="83" class="body">创建新 App，并复制内容与数据</text>
+      <path d="M18 99H392" stroke="#cddfd8"/>
+      <text x="18" y="123" class="body">调整图标坐标属于 repositionElement，</text>
+      <text x="18" y="140" class="body">不属于 Move。</text>
+    </g>
+    <rect x="1" y="789" width="458" height="30" fill="#f7f6f1"/>
+    <circle cx="20" cy="804" r="4" fill="#43836c"/>
+    <text x="30" y="808" class="micro">已选择 1 个 APP</text>
+  </g>
+
+  <!-- arrows -->
+  <path d="M515 350H550" stroke="#717971" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="533" y="337" class="micro" text-anchor="middle">MOVE</text>
+  <path d="M515 735H550" stroke="#717971" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="533" y="722" class="micro" text-anchor="middle">COPY</text>
+
+  <!-- Move dialog -->
+  <text x="565" y="112" class="section">02A / MOVE · 选择目标 APP</text>
+  <g transform="translate(565 130)">
+    <rect width="450" height="370" rx="8" fill="#faf9f5" stroke="#bfc3bb" filter="url(#modalShadow)"/>
+    <text x="23" y="27" class="micro">MOVE APP ENTRY</text>
+    <text x="23" y="56" class="modal-title">移动“伦敦时间”到</text>
+    <path d="M0 75H450" stroke="#d3d6ce"/>
+    <text x="23" y="103" class="label">选择目标 App</text>
+    <g transform="translate(23 120)">
+      <rect width="404" height="42" rx="6" fill="#edf5f1" stroke="#2f6f62"/>
+      <circle cx="20" cy="21" r="7" fill="white" stroke="#2f6f62" stroke-width="1.5"/>
+      <circle cx="20" cy="21" r="3.5" fill="#2f6f62"/>
+      <text x="39" y="18" class="strong">旅行计划</text>
+      <text x="39" y="32" class="id">targetSurfaceId: travel-plan</text>
+    </g>
+    <g transform="translate(23 170)">
+      <rect width="404" height="42" rx="6" fill="#f7f6f1" stroke="#d3d6ce"/>
+      <circle cx="20" cy="21" r="7" fill="white" stroke="#9ca39d" stroke-width="1.5"/>
+      <text x="39" y="18" class="strong">工作桌面</text>
+      <text x="39" y="32" class="id">targetSurfaceId: work-desk</text>
+    </g>
+    <rect x="23" y="230" width="404" height="49" rx="6" fill="#f0f3f1"/>
+    <path d="M40 245v19M33 255h14" stroke="#2f6f62" stroke-width="1.5"/>
+    <text x="58" y="250" class="body">将在目标 App 创建入口，然后删除来源入口。</text>
+    <text x="58" y="267" class="body">London App 本体和 ID 不变。</text>
+    <path d="M0 299H450" stroke="#d3d6ce"/>
+    <rect x="270" y="316" width="70" height="34" rx="6" fill="#e9e9e3"/>
+    <text x="305" y="337" class="button" fill="#343b37" text-anchor="middle">取消</text>
+    <rect x="350" y="316" width="77" height="34" rx="6" fill="#2f6f62"/>
+    <text x="388" y="337" class="button" fill="white" text-anchor="middle">移动</text>
+  </g>
+
+  <!-- Move result -->
+  <text x="1050" y="112" class="section">03A / MOVE · 操作结果</text>
+  <g transform="translate(1050 130)">
+    <rect width="510" height="370" rx="8" fill="#f7f6f1" stroke="#bfc3bb" filter="url(#shadow)"/>
+    <rect x="1" y="1" width="508" height="46" rx="7" fill="#faf9f5"/>
+    <text x="20" y="28" class="brand">旅行计划</text>
+    <rect x="1" y="47" width="508" height="278" fill="#eeeee8"/>
+    <rect x="1" y="47" width="508" height="278" fill="url(#grid)"/>
+    <g transform="translate(36 88)">
+      <rect width="76" height="76" rx="8" fill="#faf9f5" stroke="#bfc4bc"/>
+      <rect y="71" width="76" height="5" fill="#366b8c"/>
+      <circle cx="38" cy="34" r="18" fill="none" stroke="#366b8c" stroke-width="2.2"/>
+      <path d="M38 22v13l9 5" fill="none" stroke="#366b8c" stroke-width="2.2"/>
+      <text x="38" y="97" class="icon-label">伦敦时间</text>
+      <text x="38" y="112" class="id" text-anchor="middle">london-time</text>
+    </g>
+    <g transform="translate(159 92)">
+      <rect width="322" height="131" rx="7" fill="#faf9f5" stroke="#c9ccc4"/>
+      <rect x="15" y="15" width="66" height="20" rx="3" fill="#e6f1ec"/>
+      <text x="48" y="29" class="badge" fill="#2f6f62" text-anchor="middle">SAME APP</text>
+      <text x="15" y="58" class="strong">App 与数据没有变化</text>
+      <text x="15" y="79" class="id">appSurfaceId: london-time</text>
+      <text x="15" y="99" class="body">新入口：travel-plan / london-icon</text>
+      <text x="15" y="116" class="body">旧入口：world-clock / london-icon 已删除</text>
+    </g>
+    <rect x="1" y="325" width="508" height="44" fill="#edf5f1"/>
+    <path d="M20 346l4 4 8-9" fill="none" stroke="#2f6f62" stroke-width="1.7"/>
+    <text x="42" y="350" class="result-note">入口迁移成功，App 仍为同一个对象</text>
+  </g>
+
+  <!-- Copy dialog -->
+  <text x="565" y="557" class="section">02B / COPY · 创建独立 APP</text>
+  <g transform="translate(565 575)">
+    <rect width="450" height="375" rx="8" fill="#faf9f5" stroke="#bfc3bb" filter="url(#modalShadow)"/>
+    <text x="23" y="27" class="micro">COPY AS NEW APP</text>
+    <text x="23" y="56" class="modal-title">复制“伦敦时间”</text>
+    <path d="M0 75H450" stroke="#d3d6ce"/>
+    <text x="23" y="102" class="label">新 App 名称</text>
+    <rect x="23" y="114" width="404" height="40" rx="6" fill="white" stroke="#2f6f62" stroke-width="1.4"/>
+    <text x="37" y="139" class="body">伦敦时间副本</text>
+    <text x="23" y="181" class="label">放置到</text>
+    <rect x="23" y="193" width="404" height="42" rx="6" fill="#edf5f1" stroke="#2f6f62"/>
+    <circle cx="43" cy="214" r="7" fill="white" stroke="#2f6f62" stroke-width="1.5"/>
+    <circle cx="43" cy="214" r="3.5" fill="#2f6f62"/>
+    <text x="62" y="211" class="strong">旅行计划</text>
+    <text x="62" y="225" class="id">targetSurfaceId: travel-plan</text>
+    <text x="23" y="259" class="label">数据</text>
+    <rect x="23" y="270" width="194" height="32" rx="6" fill="#eef2f6" stroke="#366b8c"/>
+    <circle cx="41" cy="286" r="6" fill="white" stroke="#366b8c" stroke-width="1.3"/>
+    <circle cx="41" cy="286" r="3" fill="#366b8c"/>
+    <text x="55" y="290" class="body">复制现有数据</text>
+    <rect x="225" y="270" width="202" height="32" rx="6" fill="#f7f6f1" stroke="#d3d6ce"/>
+    <circle cx="243" cy="286" r="6" fill="white" stroke="#9ca39d" stroke-width="1.3"/>
+    <text x="257" y="290" class="body">使用空数据</text>
+    <path d="M0 315H450" stroke="#d3d6ce"/>
+    <rect x="258" y="327" width="70" height="34" rx="6" fill="#e9e9e3"/>
+    <text x="293" y="348" class="button" fill="#343b37" text-anchor="middle">取消</text>
+    <rect x="338" y="327" width="89" height="34" rx="6" fill="#366b8c"/>
+    <text x="383" y="348" class="button" fill="white" text-anchor="middle">创建副本</text>
+  </g>
+
+  <!-- Copy result -->
+  <text x="1050" y="557" class="section">03B / COPY · 操作结果</text>
+  <g transform="translate(1050 575)">
+    <rect width="510" height="375" rx="8" fill="#f7f6f1" stroke="#bfc3bb" filter="url(#shadow)"/>
+    <rect x="1" y="1" width="508" height="46" rx="7" fill="#faf9f5"/>
+    <text x="20" y="28" class="brand">旅行计划</text>
+    <rect x="1" y="47" width="508" height="283" fill="#eeeee8"/>
+    <rect x="1" y="47" width="508" height="283" fill="url(#grid)"/>
+    <g transform="translate(32 84)">
+      <g>
+        <rect width="74" height="74" rx="8" fill="#faf9f5" stroke="#bfc4bc"/>
+        <rect y="69" width="74" height="5" fill="#366b8c"/>
+        <circle cx="37" cy="33" r="17" fill="none" stroke="#366b8c" stroke-width="2.1"/>
+        <path d="M37 22v12l8 5" fill="none" stroke="#366b8c" stroke-width="2.1"/>
+        <text x="37" y="94" class="icon-label">伦敦时间</text>
+        <text x="37" y="109" class="id" text-anchor="middle">london-time</text>
+      </g>
+      <g transform="translate(112)">
+        <rect width="74" height="74" rx="8" fill="#f4f7fa" stroke="#9db6c7"/>
+        <rect y="69" width="74" height="5" fill="#5b829c"/>
+        <circle cx="37" cy="33" r="17" fill="none" stroke="#5b829c" stroke-width="2.1"/>
+        <path d="M37 22v12l8 5" fill="none" stroke="#5b829c" stroke-width="2.1"/>
+        <text x="37" y="94" class="icon-label">伦敦时间副本</text>
+        <text x="37" y="109" class="id" text-anchor="middle">london-copy-01</text>
+      </g>
+    </g>
+    <g transform="translate(242 78)">
+      <rect width="244" height="160" rx="7" fill="#faf9f5" stroke="#c9ccc4"/>
+      <rect x="15" y="15" width="76" height="20" rx="3" fill="#e8eff5"/>
+      <text x="53" y="29" class="badge" fill="#366b8c" text-anchor="middle">NEW APP</text>
+      <text x="15" y="57" class="strong">独立副本已创建</text>
+      <text x="15" y="79" class="id">newAppSurfaceId: london-copy-01</text>
+      <text x="15" y="99" class="body">新元素 ID：重新生成</text>
+      <text x="15" y="118" class="body">本地数据：已复制，之后独立</text>
+      <text x="15" y="137" class="body">原 App：保持不变</text>
+    </g>
+    <rect x="1" y="330" width="508" height="44" fill="#eef2f6"/>
+    <path d="M20 351l4 4 8-9" fill="none" stroke="#366b8c" stroke-width="1.7"/>
+    <text x="42" y="355" class="result-note">两个 App 可分别修改，互不影响</text>
+  </g>
+</svg>

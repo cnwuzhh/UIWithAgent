@@ -1,0 +1,193 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1080" viewBox="0 0 1600 1080">
+  <defs>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M24 0H0V24" fill="none" stroke="#dfe0d9" stroke-width="1"/>
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#1e2622" flood-opacity="0.12"/>
+    </filter>
+    <filter id="modalShadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#151a17" flood-opacity="0.23"/>
+    </filter>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#6f776f"/>
+    </marker>
+    <style>
+      .title { font: 600 30px Georgia, 'Microsoft YaHei', serif; fill: #202522; }
+      .subtitle { font: 500 13px 'Microsoft YaHei', sans-serif; fill: #737a74; }
+      .section { font: 800 12px 'Microsoft YaHei', sans-serif; fill: #5d655f; letter-spacing: 1px; }
+      .brand { font: 700 16px Georgia, 'Microsoft YaHei', serif; fill: #202522; }
+      .nav { font: 700 11px 'Microsoft YaHei', sans-serif; fill: #29302c; }
+      .micro { font: 700 9px 'Microsoft YaHei', sans-serif; fill: #858b85; letter-spacing: 1px; }
+      .icon-label { font: 700 11px 'Microsoft YaHei', sans-serif; fill: #202522; text-anchor: middle; }
+      .icon-meta { font: 500 9px 'Microsoft YaHei', sans-serif; fill: #737a74; text-anchor: middle; }
+      .modal-title { font: 500 21px Georgia, 'Microsoft YaHei', serif; fill: #202522; }
+      .label { font: 700 11px 'Microsoft YaHei', sans-serif; fill: #2d342f; }
+      .body { font: 500 10px 'Microsoft YaHei', sans-serif; fill: #4d554f; }
+      .strong { font: 700 11px 'Microsoft YaHei', sans-serif; fill: #202522; }
+      .button { font: 700 10px 'Microsoft YaHei', sans-serif; }
+      .id { font: 600 8px Consolas, monospace; fill: #737a74; }
+      .notice { font: 600 10px 'Microsoft YaHei', sans-serif; fill: #2f6f62; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1080" fill="#e9e8e2"/>
+  <text x="40" y="46" class="title">本地 App 入口 · 产品交互原型</text>
+  <text x="40" y="72" class="subtitle">用户显式授权本地应用；AgentOS 启动并跟踪进程；应用退出后恢复发起 Surface</text>
+  <text x="1560" y="48" text-anchor="end" class="section">TAURI NATIVE HOST · V0.1</text>
+
+  <!-- 01 Entry -->
+  <text x="40" y="110" class="section">01 / 本地 APP 入口</text>
+  <g transform="translate(40 128)">
+    <rect width="740" height="400" rx="8" fill="#f7f6f1" stroke="#bfc3bb" filter="url(#shadow)"/>
+    <rect x="1" y="1" width="738" height="52" rx="7" fill="#faf9f5"/>
+    <path d="M1 53H739" stroke="#c9ccc4"/>
+    <g transform="translate(20 14)">
+      <rect width="10" height="10" fill="#202522"/><rect x="13" width="10" height="10" fill="#2f6f62"/>
+      <rect y="13" width="10" height="10" fill="#2f6f62"/><rect x="13" y="13" width="10" height="10" fill="#202522"/>
+      <text x="34" y="17" class="brand">AgentOS</text>
+    </g>
+    <text x="370" y="31" class="nav" text-anchor="middle">工作桌面</text>
+    <rect x="1" y="54" width="738" height="316" fill="#eeeee8"/>
+    <rect x="1" y="54" width="738" height="316" fill="url(#grid)"/>
+    <text x="20" y="78" class="micro">SURFACE / WORK-DESK</text>
+
+    <g transform="translate(70 119)">
+      <rect x="-10" y="-10" width="110" height="145" rx="8" fill="#f7faf8" stroke="#2f6f62" stroke-width="1.6" stroke-dasharray="5 3"/>
+      <rect width="90" height="90" rx="8" fill="#f5f7fa" stroke="#aebbc5"/>
+      <rect y="85" width="90" height="5" fill="#3978a8"/>
+      <path d="M20 45L39 25l16 12 15-13v42L54 53 39 66z" fill="none" stroke="#3978a8" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M69 18h11v11M80 18L65 33" fill="none" stroke="#3978a8" stroke-width="1.7"/>
+      <text x="45" y="111" class="icon-label">VS Code</text>
+      <text x="45" y="127" class="icon-meta">本地应用 ↗</text>
+    </g>
+
+    <g transform="translate(230 103)">
+      <rect width="455" height="175" rx="8" fill="#faf9f5" stroke="#c7cbc3"/>
+      <text x="18" y="27" class="micro">LOCAL APP TARGET</text>
+      <text x="18" y="53" class="strong">Visual Studio Code</text>
+      <text x="18" y="73" class="id">localAppId: local.vscode</text>
+      <path d="M18 89H437" stroke="#e0e2dc"/>
+      <text x="18" y="112" class="body">授权状态</text>
+      <rect x="331" y="97" width="106" height="24" rx="4" fill="#fff4df"/>
+      <text x="384" y="113" class="button" fill="#a56a17" text-anchor="middle">尚未授权</text>
+      <text x="18" y="143" class="body">双击或按 Enter 将打开授权确认。</text>
+      <rect x="331" y="133" width="106" height="28" rx="6" fill="#2f6f62"/>
+      <text x="384" y="151" class="button" fill="white" text-anchor="middle">授权并打开</text>
+    </g>
+    <rect x="1" y="370" width="738" height="29" fill="#f7f6f1"/>
+    <circle cx="21" cy="385" r="4" fill="#43836c"/>
+    <text x="31" y="389" class="micro">当前 SURFACE 已保存</text>
+  </g>
+
+  <!-- 02 Authorization -->
+  <text x="820" y="110" class="section">02 / 首次授权与启动</text>
+  <g transform="translate(820 128)">
+    <rect width="740" height="400" rx="8" fill="#f7f6f1" stroke="#bfc3bb" filter="url(#shadow)"/>
+    <rect x="1" y="1" width="738" height="399" rx="8" fill="#202622" opacity="0.42"/>
+    <g transform="translate(128 29)" filter="url(#modalShadow)">
+      <rect width="484" height="341" rx="8" fill="#faf9f5" stroke="#bfc3bb"/>
+      <text x="24" y="27" class="micro">LOCAL APP PERMISSION</text>
+      <text x="24" y="57" class="modal-title">允许打开 VS Code？</text>
+      <path d="M0 76H484" stroke="#d3d6ce"/>
+      <text x="24" y="105" class="label">本地应用</text>
+      <rect x="24" y="118" width="436" height="60" rx="6" fill="#f0f3f5" stroke="#d0d6da"/>
+      <text x="39" y="141" class="strong">Visual Studio Code</text>
+      <text x="39" y="160" class="id">C:\Program Files\Microsoft VS Code\Code.exe</text>
+      <text x="24" y="204" class="label">启动后</text>
+      <circle cx="32" cy="225" r="6" fill="white" stroke="#2f6f62" stroke-width="1.3"/>
+      <circle cx="32" cy="225" r="3" fill="#2f6f62"/>
+      <text x="47" y="229" class="body">跟踪进程；关闭后返回“工作桌面”</text>
+      <rect x="24" y="247" width="436" height="42" rx="6" fill="#fff7e8"/>
+      <path d="M42 258l8 15H34z" fill="none" stroke="#a56a17" stroke-width="1.4"/>
+      <text x="62" y="264" class="body">只授权这个应用。Agent 不能更改路径或执行</text>
+      <text x="62" y="279" class="body">任意 Shell 命令。</text>
+      <path d="M0 304H484" stroke="#d3d6ce"/>
+      <rect x="306" y="314" width="68" height="30" rx="6" fill="#e9e9e3"/>
+      <text x="340" y="333" class="button" fill="#343b37" text-anchor="middle">取消</text>
+      <rect x="384" y="314" width="76" height="30" rx="6" fill="#2f6f62"/>
+      <text x="422" y="333" class="button" fill="white" text-anchor="middle">允许打开</text>
+    </g>
+  </g>
+
+  <!-- flow arrows -->
+  <path d="M770 548v31" stroke="#6f776f" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="785" y="568" class="micro">START</text>
+  <path d="M830 548v31" stroke="#6f776f" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="845" y="568" class="micro">EXIT</text>
+
+  <!-- 03 Running -->
+  <text x="40" y="608" class="section">03 / 本地应用运行中</text>
+  <g transform="translate(40 626)">
+    <rect width="740" height="405" rx="8" fill="#eef0ed" stroke="#bfc3bb" filter="url(#shadow)"/>
+    <g transform="translate(35 35)">
+      <rect width="460" height="315" rx="7" fill="#1f2328" stroke="#424a52"/>
+      <rect width="460" height="35" rx="7" fill="#181b20"/>
+      <circle cx="18" cy="17" r="5" fill="#d15f55"/><circle cx="35" cy="17" r="5" fill="#d1a24b"/><circle cx="52" cy="17" r="5" fill="#62a065"/>
+      <text x="230" y="22" class="button" fill="#c7ccd2" text-anchor="middle">Visual Studio Code</text>
+      <rect x="1" y="35" width="86" height="279" fill="#262b31"/>
+      <rect x="87" y="35" width="372" height="29" fill="#24292f"/>
+      <text x="103" y="54" class="id" fill="#b9c0c7">README.md</text>
+      <text x="105" y="91" class="id" fill="#6f9fca"># UI Built by Agent</text>
+      <text x="105" y="113" class="id" fill="#c9d1d9">Local application is running.</text>
+      <text x="19" y="61" class="micro" fill="#8f969e">EXPLORER</text>
+      <text x="19" y="87" class="id" fill="#c0c6cd">UIBUILTBYAGENT</text>
+      <text x="25" y="109" class="id" fill="#9da5ad">README.md</text>
+    </g>
+    <g transform="translate(520 35)">
+      <rect width="185" height="315" rx="7" fill="#faf9f5" stroke="#c5c9c1"/>
+      <text x="16" y="27" class="micro">AGENTOS SESSION</text>
+      <rect x="16" y="44" width="153" height="26" rx="4" fill="#e8f2ed"/>
+      <circle cx="30" cy="57" r="4" fill="#43836c"/>
+      <text x="42" y="61" class="notice">本地应用运行中</text>
+      <text x="16" y="94" class="body">应用</text>
+      <text x="16" y="112" class="strong">VS Code</text>
+      <text x="16" y="139" class="body">返回位置</text>
+      <text x="16" y="157" class="strong">工作桌面</text>
+      <text x="16" y="184" class="body">进程</text>
+      <text x="16" y="202" class="id">PID 18420 · TRACKED</text>
+      <path d="M16 220H169" stroke="#e0e2dc"/>
+      <text x="16" y="244" class="body">关闭 VS Code 后，AgentOS</text>
+      <text x="16" y="261" class="body">将恢复并聚焦原 Surface。</text>
+      <rect x="16" y="276" width="153" height="25" rx="5" fill="#ecece6"/>
+      <text x="92" y="293" class="button" fill="#343b37" text-anchor="middle">切回 AgentOS</text>
+    </g>
+  </g>
+
+  <!-- 04 Returned -->
+  <text x="820" y="608" class="section">04 / 退出后恢复原 SURFACE</text>
+  <g transform="translate(820 626)">
+    <rect width="740" height="405" rx="8" fill="#f7f6f1" stroke="#bfc3bb" filter="url(#shadow)"/>
+    <rect x="1" y="1" width="738" height="52" rx="7" fill="#faf9f5"/>
+    <path d="M1 53H739" stroke="#c9ccc4"/>
+    <text x="20" y="31" class="brand">AgentOS</text>
+    <text x="370" y="31" class="nav" text-anchor="middle">工作桌面</text>
+    <rect x="1" y="54" width="738" height="321" fill="#eeeee8"/>
+    <rect x="1" y="54" width="738" height="321" fill="url(#grid)"/>
+    <text x="20" y="78" class="micro">SURFACE / WORK-DESK · RESTORED</text>
+    <g transform="translate(65 113)">
+      <rect width="88" height="88" rx="8" fill="#f5f7fa" stroke="#aebbc5"/>
+      <rect y="83" width="88" height="5" fill="#3978a8"/>
+      <path d="M20 44L38 25l16 12 14-13v40L53 52 38 65z" fill="none" stroke="#3978a8" stroke-width="3"/>
+      <text x="44" y="108" class="icon-label">VS Code</text>
+      <text x="44" y="124" class="icon-meta">本地应用 ↗</text>
+    </g>
+    <g transform="translate(248 111)">
+      <rect width="437" height="140" rx="8" fill="#faf9f5" stroke="#c7cbc3"/>
+      <rect x="18" y="17" width="111" height="24" rx="4" fill="#e8f2ed"/>
+      <path d="M30 29l4 4 7-9" fill="none" stroke="#2f6f62" stroke-width="1.6"/>
+      <text x="82" y="33" class="notice" text-anchor="middle">应用已关闭</text>
+      <text x="18" y="66" class="strong">已返回“工作桌面”</text>
+      <text x="18" y="88" class="body">Surface、滚动位置和选中状态保持不变。</text>
+      <text x="18" y="111" class="id">session status: exited · PID 18420</text>
+    </g>
+    <g transform="translate(248 267)">
+      <rect width="437" height="66" rx="7" fill="#fff7e8" stroke="#e7d2a9"/>
+      <text x="16" y="25" class="strong" fill="#8b5b17">无法跟踪关闭状态时</text>
+      <text x="16" y="46" class="body">保留当前界面并提示，不自动假设应用已经关闭。</text>
+    </g>
+    <rect x="1" y="375" width="738" height="29" fill="#f7f6f1"/>
+    <circle cx="21" cy="390" r="4" fill="#43836c"/>
+    <text x="31" y="394" class="micro">LOCAL APP SESSION COMPLETED</text>
+  </g>
+</svg>

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#dfe0d9"/></pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#1e2622" flood-opacity=".12"/></filter>
+    <filter id="modalShadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#151a17" flood-opacity=".23"/></filter>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#89918b"/></marker>
+    <style>
+      .title{font:600 30px Georgia,'Microsoft YaHei',serif;fill:#202522}.subtitle{font:500 13px 'Microsoft YaHei',sans-serif;fill:#737a74}.section{font:800 12px 'Microsoft YaHei',sans-serif;fill:#5d655f;letter-spacing:1px}.brand{font:700 16px Georgia,'Microsoft YaHei',serif;fill:#202522}.crumb{font:700 10px 'Microsoft YaHei',sans-serif;fill:#39413c}.crumb-current{font:800 10px 'Microsoft YaHei',sans-serif;fill:#202522}.micro{font:700 9px 'Microsoft YaHei',sans-serif;fill:#858b85;letter-spacing:1px}.button{font:700 10px 'Microsoft YaHei',sans-serif}.label{font:700 11px 'Microsoft YaHei',sans-serif;fill:#2d342f}.body{font:500 10px 'Microsoft YaHei',sans-serif;fill:#4d554f}.strong{font:700 11px 'Microsoft YaHei',sans-serif;fill:#202522}.dialog-title{font:500 19px Georgia,'Microsoft YaHei',serif;fill:#202522}.id{font:600 8px Consolas,monospace;fill:#737a74}.node{font:700 10px 'Microsoft YaHei',sans-serif;fill:#202522;text-anchor:middle}.node-meta{font:500 8px 'Microsoft YaHei',sans-serif;fill:#737a74;text-anchor:middle}.hint{font:600 9px 'Microsoft YaHei',sans-serif;fill:#2f6f62}
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="#e9e8e2"/>
+  <text x="40" y="46" class="title">Wiki Navigation · 产品交互原型</text>
+  <text x="40" y="72" class="subtitle">顶部显示主树路径；当前 Surface 内嵌文本导航对话框，点击后纵向展开</text>
+  <text x="1560" y="48" text-anchor="end" class="section">TREE PATH + EMBEDDED TEXT DIALOG · V0.2</text>
+
+  <text x="40" y="110" class="section">01 / 顶部路径与内嵌文本输入条</text>
+  <g transform="translate(40 128)">
+    <rect width="740" height="720" rx="8" fill="#f7f6f1" stroke="#bfc3bb" filter="url(#shadow)"/>
+    <rect x="1" y="1" width="738" height="60" rx="7" fill="#faf9f5"/><path d="M1 61H739" stroke="#c9ccc4"/>
+    <text x="20" y="25" class="brand">AgentOS</text>
+    <g transform="translate(163 12)"><rect width="424" height="36" rx="6" fill="#f1f1eb" stroke="#d3d6ce"/><text x="14" y="22" class="crumb">桌面</text><path d="M54 13l5 5-5 5" fill="none" stroke="#909791" stroke-width="1.4"/><text x="70" y="22" class="crumb">旅行计划</text><path d="M132 13l5 5-5 5" fill="none" stroke="#909791" stroke-width="1.4"/><text x="148" y="22" class="crumb-current">伦敦时间</text><text x="404" y="22" class="micro" text-anchor="end">3 层</text></g>
+    <g transform="translate(598 12)"><rect width="42" height="36" rx="6" fill="#edf5f1" stroke="#2f6f62"/><path d="M11 12h20M11 18h20M11 24h20" stroke="#2f6f62" stroke-width="1.6" stroke-linecap="round"/></g>
+    <g transform="translate(650 12)"><rect width="70" height="36" rx="6" fill="#2f6f62"/><text x="35" y="22" class="button" fill="white" text-anchor="middle">构建</text></g>
+    <rect x="1" y="62" width="738" height="627" fill="#eeeee8"/><rect x="1" y="62" width="738" height="627" fill="url(#grid)"/><text x="20" y="86" class="micro">SURFACE / LONDON-TIME</text>
+    <g transform="translate(166 184)"><rect width="408" height="192" rx="8" fill="#faf9f5" stroke="#c4c8c0"/><rect width="408" height="4" fill="#366b8c"/><text x="22" y="34" class="micro">WORLD CLOCK</text><text x="22" y="72" class="dialog-title">伦敦</text><text x="22" y="132" style="font:600 50px Aptos,'Microsoft YaHei',sans-serif;fill:#202522">14:36:08</text><text x="22" y="166" class="body">Europe/London</text></g>
+
+    <g transform="translate(54 526)">
+      <rect width="632" height="102" rx="8" fill="#faf9f5" stroke="#bfc3bb"/>
+      <text x="18" y="24" class="micro">TEXT NAVIGATION · EMBEDDED</text><text x="18" y="48" class="strong">前往其他 Surface</text>
+      <rect x="18" y="59" width="518" height="30" rx="5" fill="white" stroke="#d0d3cb"/><text x="31" y="78" class="body">输入 Surface 名称或路径...</text>
+      <rect x="546" y="59" width="68" height="30" rx="5" fill="#edf5f1" stroke="#2f6f62"/><text x="580" y="78" class="button" fill="#2f6f62" text-anchor="middle">展开</text>
+    </g>
+    <rect x="1" y="689" width="738" height="30" fill="#f7f6f1"/><text x="20" y="708" class="micro">路径来自 PARENTSURFACEID 父链 · 链接不改变树结构</text>
+  </g>
+
+  <text x="820" y="110" class="section">02 / 展开的文本对话与跳转结果</text>
+  <g transform="translate(820 128)">
+    <rect width="740" height="720" rx="8" fill="#f7f6f1" stroke="#bfc3bb" filter="url(#shadow)"/>
+    <rect x="1" y="1" width="738" height="60" rx="7" fill="#faf9f5"/><text x="20" y="36" class="brand">AgentOS</text><text x="370" y="35" class="crumb-current" text-anchor="middle">桌面 / 工作桌面</text>
+    <rect x="1" y="62" width="738" height="627" fill="#eeeee8"/><rect x="1" y="62" width="738" height="627" fill="url(#grid)"/>
+    <g transform="translate(55 146)">
+      <rect width="630" height="470" rx="8" fill="#faf9f5" stroke="#2f6f62" stroke-width="1.4"/><text x="22" y="28" class="micro">TEXT NAVIGATION · EXPANDED IN SURFACE</text><text x="22" y="57" class="dialog-title">文本导航</text><rect x="523" y="18" width="85" height="30" rx="5" fill="#f0f3f1"/><text x="565" y="37" class="button" fill="#4d554f" text-anchor="middle">收起</text><path d="M0 76H630" stroke="#d3d6ce"/>
+      <g transform="translate(22 96)"><rect width="430" height="54" rx="7" fill="#edf5f1" stroke="#bdd2c9"/><text x="15" y="22" class="micro">AGENTOS</text><text x="15" y="40" class="body">你当前位于：桌面 / 旅行计划 / 伦敦时间</text></g>
+      <g transform="translate(162 169)"><rect width="446" height="55" rx="7" fill="#eef2f6" stroke="#c5d0d9"/><text x="428" y="22" class="micro" text-anchor="end">你</text><text x="428" y="41" class="strong" text-anchor="end">打开工作记录</text></g>
+      <g transform="translate(22 244)"><rect width="500" height="82" rx="7" fill="#edf5f1" stroke="#bdd2c9"/><text x="15" y="22" class="micro">AGENTOS</text><text x="15" y="43" class="strong">已跳转到“工作桌面”</text><text x="15" y="64" class="body">当前位置已更新：桌面 / 工作桌面</text></g>
+      <path d="M0 352H630" stroke="#d3d6ce"/><rect x="22" y="372" width="500" height="42" rx="6" fill="white" stroke="#d0d3cb"/><text x="37" y="398" class="body">输入 Surface 名称或路径...</text><rect x="532" y="372" width="76" height="42" rx="6" fill="#2f6f62"/><text x="570" y="398" class="button" fill="white" text-anchor="middle">前往</text>
+      <text x="22" y="445" class="hint">对话框嵌入当前 Surface；点击收起恢复为输入条</text>
+    </g>
+    <rect x="1" y="689" width="738" height="30" fill="#f7f6f1"/><text x="20" y="708" class="micro">当前树位置已更新 · 链接来源不进入目标路径</text>
+  </g>
+</svg>
