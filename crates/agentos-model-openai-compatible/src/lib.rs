@@ -7,10 +7,17 @@ use agentos_contracts::{
 };
 use agentos_generated_app_runtime::{GeneratedAppPackageDraft, validate_package};
 use agentos_toolbox::{ConfigValueKind, ElementAvailability, ToolboxDescriptor};
+use github_copilot_sdk::{
+    CliProgram, Client as CopilotClient, ClientMode, ClientOptions as CopilotClientOptions,
+    MessageOptions as CopilotMessageOptions, SessionConfig as CopilotSessionConfig,
+    SystemMessageConfig,
+};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::error::Error;
+use std::ffi::OsStr;
+use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -75,12 +82,83 @@ const CODE_REVIEW_FORMAT_REPAIR_PROMPT: &str = r#"Your code review verdict was i
 const CODE_REVISION_PROMPT: &str = r#"Revise the complete generated package to resolve every code review issue while preserving the approved plan, data contract, UI typeId, and adapterId. Make the smallest targeted implementation changes needed for the listed blocking issues: preserve unrelated manifest fields, files, tests, and behavior byte-for-byte where possible, never reintroduce an issue already absent from the current package, and add or update a focused regression assertion for each changed behavior. Return the entire package as exactly one manifest/files JSON object, including every unchanged and changed file in full. Do not include MANIFEST.json, agentos-manifest.json, any other Host-owned manifest file, Markdown, commentary, execution claims, or build results."#;
 const MAX_CODE_REVISION_CYCLES: u8 = 5;
 const MAX_PROVIDER_ATTEMPTS: u8 = 2;
+const DEFAULT_MODEL_PROVIDER: &str = "github-copilot";
+const DEFAULT_COPILOT_MODEL: &str = "gpt-5.6-sol";
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum ModelProvider {
+    OpenAiCompatible,
+    GitHubCopilot,
+    Unsupported(String),
+}
+
+impl ModelProvider {
+    fn from_name(value: &str) -> Self {
+        match value.trim().to_ascii_lowercase().as_str() {
+            "openai-compatible" | "openai" => Self::OpenAiCompatible,
+            "github-copilot" | "copilot" => Self::GitHubCopilot,
+            _ => Self::Unsupported(value.trim().to_string()),
+        }
+    }
+
+    fn ledger_name(&self) -> &str {
+        match self {
+            Self::OpenAiCompatible => "openai-compatible",
+            Self::GitHubCopilot => "github-copilot",
+            Self::Unsupported(_) => "unsupported",
+        }
+    }
+}
+
+fn find_copilot_cli(path: Option<&OsStr>) -> Option<PathBuf> {
+    let executable_names: &[&str] = if cfg!(windows) {
+        &["copilot.exe", "copilot.cmd", "copilot.bat", "copilot"]
+    } else {
+        &["copilot"]
+    };
+    path.into_iter()
+        .flat_map(env::split_paths)
+        .flat_map(|directory| {
+            executable_names
+                .iter()
+                .map(move |name| directory.join(name))
+        })
+        .find(|candidate| candidate.is_file())
+}
+
+fn copilot_cli_path() -> Result<PathBuf, String> {
+    if let Some(path) = env::var_os("COPILOT_CLI_PATH").map(PathBuf::from) {
+        if path.is_file() {
+            return Ok(path);
+        }
+        return Err(format!(
+            "COPILOT_CLI_PATH 指向的文件不存在：{}",
+            path.display()
+        ));
+    }
+    find_copilot_cli(env::var_os("PATH").as_deref()).ok_or_else(|| {
+        "未找到 GitHub Copilot CLI；请先安装并登录 copilot，或设置 COPILOT_CLI_PATH".to_string()
+    })
+}
+
+fn copilot_home() -> Result<PathBuf, String> {
+    if let Some(path) = env::var_os("COPILOT_HOME").map(PathBuf::from) {
+        return Ok(path);
+    }
+    env::var_os("HOME")
+        .map(PathBuf::from)
+        .map(|home| home.join(".copilot"))
+        .ok_or_else(|| "未找到 Copilot 配置目录；请设置 COPILOT_HOME".to_string())
+}
 
 pub struct OpenAiCompatiblePlanningAgent {
     client: Client,
+    provider: ModelProvider,
     base_url: String,
     model: Option<String>,
     api_key: Option<String>,
+    github_token: Option<String>,
+    timeout: Duration,
     ledger: Arc<dyn AgentLedger>,
 }
 
@@ -90,35 +168,62 @@ impl OpenAiCompatiblePlanningAgent {
             .ok()
             .and_then(|value| value.parse().ok())
             .unwrap_or(600);
+        let provider = ModelProvider::from_name(
+            &env::var("AGENTOS_MODEL_PROVIDER").unwrap_or_else(|_| DEFAULT_MODEL_PROVIDER.into()),
+        );
         Self {
             client: Client::builder()
                 .timeout(Duration::from_secs(timeout_seconds))
                 .build()
                 .expect("static HTTP client configuration must be valid"),
+            provider: provider.clone(),
             base_url: env::var("AGENTOS_MODEL_BASE_URL")
                 .unwrap_or_else(|_| "https://api.openai.com/v1".into())
                 .trim_end_matches('/')
                 .into(),
-            model: env::var("AGENTOS_MODEL_NAME").ok(),
+            model: env::var("AGENTOS_MODEL_NAME").ok().or_else(|| {
+                (provider == ModelProvider::GitHubCopilot).then(|| DEFAULT_COPILOT_MODEL.into())
+            }),
             api_key: env::var("AGENTOS_MODEL_API_KEY")
                 .or_else(|_| env::var("OPENAI_API_KEY"))
                 .ok(),
+            github_token: env::var("AGENTOS_GITHUB_TOKEN")
+                .or_else(|_| env::var("GH_TOKEN"))
+                .ok(),
+            timeout: Duration::from_secs(timeout_seconds),
             ledger,
         }
     }
 
-    fn configuration(&self) -> Result<(&str, &str), String> {
-        let model = self.model.as_deref().filter(|value| !value.trim().is_empty()).ok_or(
-            "Agent 未配置：请设置 AGENTOS_MODEL_NAME 和 AGENTOS_MODEL_API_KEY（或 OPENAI_API_KEY）",
-        )?;
-        let api_key = self
-            .api_key
+    fn configuration(&self) -> Result<(&str, Option<&str>), String> {
+        let model = self
+            .model
             .as_deref()
             .filter(|value| !value.trim().is_empty())
-            .ok_or(
-                "Agent 未配置：请设置 AGENTOS_MODEL_NAME 和 AGENTOS_MODEL_API_KEY（或 OPENAI_API_KEY）",
-            )?;
-        Ok((model, api_key))
+            .ok_or_else(|| match self.provider {
+                ModelProvider::GitHubCopilot => {
+                    format!(
+                        "GitHub Copilot 未配置模型，请设置 AGENTOS_MODEL_NAME（推荐 {DEFAULT_COPILOT_MODEL}）"
+                    )
+                }
+                _ => "Agent 未配置：请设置 AGENTOS_MODEL_NAME 和 AGENTOS_MODEL_API_KEY（或 OPENAI_API_KEY）".to_string(),
+            })?;
+        match &self.provider {
+            ModelProvider::OpenAiCompatible => {
+                let api_key = self
+                    .api_key
+                    .as_deref()
+                    .filter(|value| !value.trim().is_empty())
+                    .ok_or(
+                        "Agent 未配置：请设置 AGENTOS_MODEL_NAME 和 AGENTOS_MODEL_API_KEY（或 OPENAI_API_KEY）",
+                    )?;
+                Ok((model, Some(api_key)))
+            }
+            ModelProvider::GitHubCopilot => Ok((model, None)),
+            ModelProvider::Unsupported(provider) => Err(format!(
+                "不支持的模型 provider：{provider}；可选值为 openai-compatible 或 github-copilot"
+            )),
+        }
     }
 
     async fn call_model(
@@ -126,10 +231,16 @@ impl OpenAiCompatiblePlanningAgent {
         stream_id: &agentos_agent_ledger::LedgerStreamId,
         causation_event_id: String,
         model: &str,
-        api_key: &str,
+        api_key: Option<&str>,
         messages: Vec<ChatMessage>,
         turn: u8,
     ) -> Result<(String, String), String> {
+        if self.provider == ModelProvider::GitHubCopilot {
+            return self
+                .call_copilot_model(stream_id, causation_event_id, model, messages, turn)
+                .await;
+        }
+        let api_key = api_key.ok_or_else(|| "模型服务缺少 API Key".to_string())?;
         let body = ChatCompletionRequest {
             model,
             messages,
@@ -149,7 +260,7 @@ impl OpenAiCompatiblePlanningAgent {
                         actor: LedgerActor::AgentRuntime,
                         causation_event_id: Some(attempt_causation_event_id),
                         payload: serde_json::json!({
-                            "provider": "openai-compatible",
+                            "provider": self.provider.ledger_name(),
                             "model": model,
                             "turn": turn,
                             "providerAttempt": provider_attempt,
@@ -265,6 +376,170 @@ impl OpenAiCompatiblePlanningAgent {
             return Ok((content, response_event.event_id));
         }
         unreachable!("provider attempt loop always returns")
+    }
+
+    async fn call_copilot_model(
+        &self,
+        stream_id: &agentos_agent_ledger::LedgerStreamId,
+        causation_event_id: String,
+        model: &str,
+        messages: Vec<ChatMessage>,
+        turn: u8,
+    ) -> Result<(String, String), String> {
+        let request_body =
+            serde_json::to_vec(&messages).map_err(|_| "无法序列化模型请求".to_string())?;
+        let mut attempt_causation_event_id = causation_event_id;
+        for provider_attempt in 1..=MAX_PROVIDER_ATTEMPTS {
+            let request_event = self
+                .ledger
+                .append(
+                    NewLedgerEvent {
+                        stream_id: stream_id.clone(),
+                        event_type: LedgerEventType::ModelRequestStarted,
+                        actor: LedgerActor::AgentRuntime,
+                        causation_event_id: Some(attempt_causation_event_id),
+                        payload: serde_json::json!({
+                            "provider": self.provider.ledger_name(),
+                            "model": model,
+                            "turn": turn,
+                            "providerAttempt": provider_attempt,
+                        }),
+                    },
+                    vec![NewArtifact {
+                        relation: "request".into(),
+                        media_type: "application/json".into(),
+                        bytes: request_body.clone(),
+                    }],
+                )
+                .await
+                .map_err(ledger_error)?;
+            match self.invoke_copilot(model, &messages).await {
+                Ok(content) => {
+                    let response_event = self
+                        .ledger
+                        .append(
+                            NewLedgerEvent {
+                                stream_id: stream_id.clone(),
+                                event_type: LedgerEventType::ModelResponseReceived,
+                                actor: LedgerActor::ModelProvider,
+                                causation_event_id: Some(request_event.event_id),
+                                payload: serde_json::json!({
+                                    "turn": turn,
+                                    "providerAttempt": provider_attempt,
+                                }),
+                            },
+                            vec![NewArtifact::utf8(
+                                "response",
+                                "text/plain; charset=utf-8",
+                                content.clone(),
+                            )],
+                        )
+                        .await
+                        .map_err(ledger_error)?;
+                    return Ok((content, response_event.event_id));
+                }
+                Err(message) => {
+                    let failure_event_id = self
+                        .record_model_failure(
+                            stream_id,
+                            request_event.event_id,
+                            turn,
+                            provider_attempt,
+                            "copilotSdk",
+                            &message,
+                        )
+                        .await?;
+                    if provider_attempt < MAX_PROVIDER_ATTEMPTS {
+                        attempt_causation_event_id = failure_event_id;
+                        continue;
+                    }
+                    return Err(message);
+                }
+            }
+        }
+        unreachable!("provider attempt loop always returns")
+    }
+
+    async fn invoke_copilot(
+        &self,
+        model: &str,
+        messages: &[ChatMessage],
+    ) -> Result<String, String> {
+        let mut options = CopilotClientOptions::default().with_mode(ClientMode::CopilotCli);
+        options.program = CliProgram::Path(copilot_cli_path()?);
+        options.base_directory = Some(copilot_home()?);
+        let working_directory =
+            env::temp_dir().join(format!("agentos-copilot-{}", std::process::id()));
+        std::fs::create_dir_all(&working_directory)
+            .map_err(|error| format!("无法创建 GitHub Copilot 隔离目录：{error}"))?;
+        options.working_directory = working_directory;
+        options.github_token = self.github_token.clone();
+        options.use_logged_in_user = Some(self.github_token.is_none());
+        let client = CopilotClient::start(options)
+            .await
+            .map_err(|error| format!("无法启动 GitHub Copilot SDK：{error}"))?;
+
+        let system_content = messages
+            .iter()
+            .filter(|message| message.role == "system")
+            .map(|message| message.content.as_str())
+            .collect::<Vec<_>>()
+            .join("\n\n");
+        let prompt = messages
+            .iter()
+            .filter(|message| message.role != "system")
+            .map(|message| {
+                format!(
+                    "<{}>\n{}\n</{}>",
+                    message.role, message.content, message.role
+                )
+            })
+            .collect::<Vec<_>>()
+            .join("\n\n");
+        let mut session_config = CopilotSessionConfig::default().deny_all_permissions();
+        session_config.model = Some(model.to_string());
+        session_config.available_tools = Some(Vec::new());
+        session_config.system_message = Some(
+            SystemMessageConfig::new()
+                .with_mode("replace")
+                .with_content(system_content),
+        );
+        let result = async {
+            let session = client
+                .create_session(session_config)
+                .await
+                .map_err(|error| format!("无法创建 GitHub Copilot 会话：{error}"))?;
+            let content_result = session
+                .send_and_wait(CopilotMessageOptions::new(prompt).with_wait_timeout(self.timeout))
+                .await
+                .map_err(|error| format!("GitHub Copilot 调用失败：{error}"))
+                .and_then(|event| event.ok_or_else(|| "GitHub Copilot 没有返回响应".to_string()))
+                .and_then(|event| {
+                    event
+                        .data
+                        .get("content")
+                        .and_then(|value| value.as_str())
+                        .filter(|value| !value.trim().is_empty())
+                        .map(str::to_string)
+                        .ok_or_else(|| "GitHub Copilot 返回了空响应".to_string())
+                });
+            let disconnect_result = session
+                .disconnect()
+                .await
+                .map_err(|error| format!("无法关闭 GitHub Copilot 会话：{error}"));
+            match (content_result, disconnect_result) {
+                (Ok(content), Ok(())) => Ok(content),
+                (Err(error), _) => Err(error),
+                (Ok(_), Err(error)) => Err(error),
+            }
+        }
+        .await;
+        let stop_result = client.stop().await;
+        match (result, stop_result) {
+            (Ok(content), Ok(())) => Ok(content),
+            (Err(error), _) => Err(error),
+            (Ok(_), Err(error)) => Err(format!("无法停止 GitHub Copilot SDK：{error}")),
+        }
     }
 
     async fn record_model_failure(
@@ -1205,14 +1480,14 @@ fn validate_generated_candidate(
 mod tests {
     use super::{
         BUILD_READINESS_REVIEW_PROMPT, CODE_GENERATION_PROMPT, CODE_REVIEW_PROMPT,
-        CODE_REVISION_PROMPT, CRITIC_PROMPT, DERIVED_OUTPUT_CRITIC_PROMPT,
-        FINAL_FORMAT_REPAIR_PROMPT, FORMAT_REPAIR_PROMPT,
+        CODE_REVISION_PROMPT, CRITIC_PROMPT, DEFAULT_COPILOT_MODEL, DEFAULT_MODEL_PROVIDER,
+        DERIVED_OUTPUT_CRITIC_PROMPT, FINAL_FORMAT_REPAIR_PROMPT, FORMAT_REPAIR_PROMPT,
         GENERATED_APP_RUNTIME_PROMPT, MAX_PLAN_FORMAT_REPAIRS, MAX_PROVIDER_ATTEMPTS,
-        OpenAiCompatiblePlanningAgent, PLAN_ONLY_INSTRUCTION, REVISION_PROMPT,
+        ModelProvider, OpenAiCompatiblePlanningAgent, PLAN_ONLY_INSTRUCTION, REVISION_PROMPT,
         SURFACE_AGENT_SCOPE_PROMPT, SYSTEM_PROMPT, build_toolbox_prompt, build_user_prompt,
-        is_better_review_candidate, is_retryable_provider_status, parse_plan_payload,
-        plan_format_repair_prompt, provider_error_message, validate_generated_package_against_plan,
-        validate_ui_binding,
+        find_copilot_cli, is_better_review_candidate, is_retryable_provider_status,
+        parse_plan_payload, plan_format_repair_prompt, provider_error_message,
+        validate_generated_package_against_plan, validate_ui_binding,
     };
     use agentos_agent_ledger::{
         AgentLedger, AgentLedgerEvent, LedgerAppendReceipt, LedgerError, LedgerEventType,
@@ -1231,6 +1506,74 @@ mod tests {
     use std::net::TcpListener;
     use std::sync::Arc;
     use std::thread;
+
+    #[test]
+    fn finds_copilot_cli_on_path() {
+        let directory =
+            std::env::temp_dir().join(format!("agentos-copilot-path-test-{}", std::process::id()));
+        std::fs::create_dir_all(&directory).unwrap();
+        let executable = directory.join(if cfg!(windows) {
+            "copilot.exe"
+        } else {
+            "copilot"
+        });
+        std::fs::write(&executable, []).unwrap();
+
+        assert_eq!(
+            find_copilot_cli(Some(directory.as_os_str())),
+            Some(executable)
+        );
+
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+
+    fn test_agent(provider: ModelProvider) -> OpenAiCompatiblePlanningAgent {
+        OpenAiCompatiblePlanningAgent {
+            client: reqwest::Client::new(),
+            provider,
+            base_url: "http://127.0.0.1:9".into(),
+            model: Some("test-model".into()),
+            api_key: None,
+            github_token: None,
+            timeout: std::time::Duration::from_secs(10),
+            ledger: Arc::new(agentos_agent_ledger::InMemoryAgentLedger::default()),
+        }
+    }
+
+    #[test]
+    fn parses_supported_model_providers() {
+        assert_eq!(
+            ModelProvider::from_name("openai-compatible"),
+            ModelProvider::OpenAiCompatible
+        );
+        assert_eq!(
+            ModelProvider::from_name("copilot"),
+            ModelProvider::GitHubCopilot
+        );
+    }
+
+    #[test]
+    fn github_copilot_is_the_default_provider_name() {
+        assert_eq!(
+            ModelProvider::from_name(DEFAULT_MODEL_PROVIDER),
+            ModelProvider::GitHubCopilot
+        );
+        assert_eq!(DEFAULT_COPILOT_MODEL, "gpt-5.6-sol");
+    }
+
+    #[test]
+    fn copilot_configuration_uses_cli_auth_without_openai_key() {
+        let agent = test_agent(ModelProvider::GitHubCopilot);
+
+        assert_eq!(agent.configuration().unwrap(), ("test-model", None));
+    }
+
+    #[test]
+    fn unsupported_provider_fails_configuration() {
+        let agent = test_agent(ModelProvider::Unsupported("other".into()));
+
+        assert!(agent.configuration().unwrap_err().contains("other"));
+    }
 
     struct AppendFailingLedger {
         inner: agentos_agent_ledger::InMemoryAgentLedger,
@@ -1486,9 +1829,12 @@ mod tests {
         let stream_id = ledger.create_stream("http-failure").await.unwrap();
         let agent = OpenAiCompatiblePlanningAgent {
             client: reqwest::Client::new(),
+            provider: ModelProvider::OpenAiCompatible,
             base_url: format!("http://{address}"),
             model: Some("test-model".into()),
             api_key: Some("test-key".into()),
+            github_token: None,
+            timeout: std::time::Duration::from_secs(10),
             ledger: ledger.clone(),
         };
 
@@ -1497,7 +1843,7 @@ mod tests {
                 &stream_id,
                 "cause".into(),
                 "test-model",
-                "test-key",
+                Some("test-key"),
                 vec![],
                 7,
             )
@@ -1727,9 +2073,12 @@ mod tests {
         futures_lite::future::block_on(async {
             let agent = OpenAiCompatiblePlanningAgent {
                 client: reqwest::Client::new(),
+                provider: ModelProvider::OpenAiCompatible,
                 base_url: "http://127.0.0.1:9".into(),
                 model: Some("test-model".into()),
                 api_key: Some("test-key".into()),
+                github_token: None,
+                timeout: std::time::Duration::from_secs(10),
                 ledger: Arc::new(AppendFailingLedger {
                     inner: agentos_agent_ledger::InMemoryAgentLedger::default(),
                 }),
@@ -1754,9 +2103,12 @@ mod tests {
             let stream_id = ledger.create_stream("generate-1").await.unwrap();
             let agent = OpenAiCompatiblePlanningAgent {
                 client: reqwest::Client::new(),
+                provider: ModelProvider::OpenAiCompatible,
                 base_url: "http://127.0.0.1:9".into(),
                 model: Some("test-model".into()),
                 api_key: Some("test-key".into()),
+                github_token: None,
+                timeout: std::time::Duration::from_secs(10),
                 ledger: ledger.clone(),
             };
 

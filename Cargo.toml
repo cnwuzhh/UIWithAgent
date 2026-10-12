@@ -14,7 +14,7 @@ members = [
 [workspace.package]
 edition = "2024"
 license = "MIT"
-rust-version = "1.85"
+rust-version = "1.94"
 version = "0.1.0"
 
 [workspace.dependencies]
@@ -27,6 +27,7 @@ agentos-model-openai-compatible = { path = "crates/agentos-model-openai-compatib
 agentos-toolbox = { path = "crates/agentos-toolbox" }
 async-trait = "0.1"
 futures-lite = "2"
+github-copilot-sdk = { version = "1.0.20-preview.2", default-features = false, features = ["runtime"] }
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 rusqlite = { version = "0.32", features = ["bundled"] }
 serde = { version = "1", features = ["derive"] }

@@ -12,6 +12,7 @@ agentos-contracts.workspace = true
 agentos-generated-app-runtime.workspace = true
 agentos-toolbox.workspace = true
 async-trait.workspace = true
+github-copilot-sdk.workspace = true
 reqwest.workspace = true
 serde.workspace = true
 serde_json.workspace = true

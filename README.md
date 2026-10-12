@@ -55,9 +55,18 @@ just test
 just dev
 ```
 
-启动前配置 OpenAI-compatible 模型服务：
+默认使用 GitHub Copilot 订阅作为模型服务。先按照 GitHub 官方文档安装并登录 Copilot CLI，确认 `copilot --version` 可用，然后直接启动：
 
 ```bash
+pnpm dev
+```
+
+默认模型为 `gpt-5.6-sol`。Copilot provider 必须能从 `PATH` 找到 Copilot CLI（也可用 `COPILOT_CLI_PATH` 指定）；认证默认复用 Copilot CLI 的已登录身份，也可通过 `AGENTOS_GITHUB_TOKEN`（或 `GH_TOKEN`）显式提供 GitHub token。它使用官方 `github-copilot-sdk`，会话不提供任何工具并拒绝所有工具权限，不读取仓库文件或执行 Shell。Rust SDK 依赖 Rust 1.94 或更高版本。
+
+如需使用 OpenAI-compatible 模型服务，显式配置：
+
+```bash
+export AGENTOS_MODEL_PROVIDER="openai-compatible"
 export AGENTOS_MODEL_BASE_URL="https://api.openai.com/v1"
 export AGENTOS_MODEL_NAME="your-model-name"
 export AGENTOS_MODEL_API_KEY="your-api-key"
