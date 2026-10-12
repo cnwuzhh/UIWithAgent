@@ -16,6 +16,7 @@ AgentOS 允许用户在二维 Surface 中使用持久 GUI，并通过 Agent 创�
 5. Surface 以主树组织，通过链接跨节点跳转；当前位置始终映射到唯一树路径。
 6. 桌面能力在 Ubuntu 24.04 的 Wayland 环境中采用可验证、可降级的实现。
 7. MVP 保持单机和模块化单体，不提前引入分布式系统复杂度。
+8. Agent 的全部对话、代码和行为写入不可静默丢失的 Agent Ledger，并可按 BuildTask 重建因果链。
 
 ## 2. 系统上下文
 
@@ -103,7 +104,10 @@ Rust Host 是本机信任边界：
 - 只通过 Agent System API 获取系统上下文和提交变更；
 - 不链接 Repository、SQLx 或 Tauri command；
 - 任务取消、会话过期或 Host 退出时立即终止；
-- 后续可在 bubblewrap 沙箱中运行，但 MVP 不允许任意代码执行。
+- PoC 阶段允许生成任意应用代码，包括网络爬虫、API client 和业务逻辑；
+- Agent 生成代码与 Agent Worker 分离，由 Generated App Runtime 保存、构建和执行；
+- 首期只硬性限制最终 UI 必须使用已注册 Surface Element；
+- SDK 与 bubblewrap 沙箱在验证自由编程闭环后逐步完善和收紧。
 
 ## 4. 分层与依赖规则
 
@@ -154,6 +158,10 @@ flowchart TB
 | [Repository](modules/14-repository.md) | Rust traits | 领域对象、Unit of Work 和 revision ports |
 | [SQLite Adapter](modules/15-sqlite-adapter.md) | SQLx | Schema migration、事务与领域对象映射 |
 | [Observability](modules/16-observability.md) | tracing | 结构化日志、correlation ID、诊断导出 |
+| [Agent Runtime](modules/17-agent-runtime.md) | Rust/Tokio | 分层 Prompt、Runtime Descriptor、Skills、上下文预算和受控 Agent loop |
+| [Agent Toolbox](modules/18-agent-toolbox.md) | Rust | 版本化 Element Catalog、App Recipe、受限命令编译和数据能力声明 |
+| [Generated App Runtime](modules/19-generated-app-runtime.md) | Rust/Tokio + 子进程 | 保存、构建、运行和修复 Agent 自由生成的应用代码，并绑定到注册 Element |
+| [Agent Ledger](modules/20-agent-ledger.md) | Rust application port + SQLite | 完整记录对话、模型 I/O、代码 revision、tool、命令、进程输出、确认和提交 |
 
 ## 6. 权威状态与状态边界
 
@@ -169,6 +177,7 @@ flowchart TB
 - BuildTask 和确认结果；
 - LocalAppDefinition 与授权状态；
 - Operation history、revision 和 audit metadata。
+- Agent Ledger stream、完整对话、代码 revision 与所有行为 Artifact。
 
 ### 6.2 Shell 持久偏好
 

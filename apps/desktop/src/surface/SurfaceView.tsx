@@ -27,19 +27,24 @@ function TimePanel({ element }: { element: Extract<SurfaceElement, { type: "time
   );
 }
 
-function AppIcon({ element, editing, onOpenSurface }: {
+function AppIcon({ element, editing, onOpenSurface, onOpenBuildTask }: {
   element: Extract<SurfaceElement, { type: "appIcon" }>;
   editing: boolean;
   onOpenSurface: (surfaceId: string) => void;
+  onOpenBuildTask: (buildTaskId: string) => void;
 }) {
   const ready = element.status === "ready" && element.targetSurfaceId;
+  const buildTaskId = element.status === "building" ? element.buildTaskId : undefined;
   return (
     <button
       type="button"
       className={`app-icon${ready ? "" : " building"}`}
-      aria-disabled={!ready}
+      aria-label={buildTaskId ? `${element.title}，查看构建详情` : element.title}
+      onClick={() => !editing && buildTaskId && onOpenBuildTask(buildTaskId)}
       onDoubleClick={() => !editing && ready && onOpenSurface(ready)}
-      onKeyDown={(event) => !editing && ready && event.key === "Enter" && onOpenSurface(ready)}
+      onKeyDown={(event) => {
+        if (!editing && !buildTaskId && ready && event.key === "Enter") onOpenSurface(ready);
+      }}
     >
       <span>{ready ? <BriefcaseBusiness size={25} /> : <Hammer size={24} />}</span>
       <strong>{element.title}</strong>
@@ -63,12 +68,13 @@ function TextPanel({ element, editing, onOpenSurface }: {
   );
 }
 
-function SurfaceElementView({ element, editing, selected, previewPosition, onOpenSurface, onPointerDown, onPointerMove, onPointerUp, onPointerCancel, onReposition, onResize, onRemove }: {
+function SurfaceElementView({ element, editing, selected, previewPosition, onOpenSurface, onOpenBuildTask, onPointerDown, onPointerMove, onPointerUp, onPointerCancel, onReposition, onResize, onRemove }: {
   element: SurfaceElement;
   editing: boolean;
   selected: boolean;
   previewPosition?: { x: number; y: number };
   onOpenSurface: (surfaceId: string) => void;
+  onOpenBuildTask: (buildTaskId: string) => void;
   onPointerDown: (event: ReactPointerEvent<HTMLDivElement>, element: SurfaceElement) => void;
   onPointerMove: (event: ReactPointerEvent<HTMLDivElement>) => void;
   onPointerUp: (event: ReactPointerEvent<HTMLDivElement>) => void;
@@ -80,7 +86,7 @@ function SurfaceElementView({ element, editing, selected, previewPosition, onOpe
   const content = (() => {
     switch (element.type) {
       case "timePanel": return <TimePanel element={element} />;
-      case "appIcon": return <AppIcon element={element} editing={editing} onOpenSurface={onOpenSurface} />;
+      case "appIcon": return <AppIcon element={element} editing={editing} onOpenSurface={onOpenSurface} onOpenBuildTask={onOpenBuildTask} />;
       case "textPanel": return <TextPanel element={element} editing={editing} onOpenSurface={onOpenSurface} />;
     }
   })();
@@ -136,10 +142,11 @@ type DragState = {
   y: number;
 };
 
-export function SurfaceView({ revision, surface, onOpenSurface, onRepositionElement, onResizeElement, onAddTimePanel, onRemoveElement }: {
+export function SurfaceView({ revision, surface, onOpenSurface, onOpenBuildTask, onRepositionElement, onResizeElement, onAddTimePanel, onRemoveElement }: {
   revision: number;
   surface: RuntimeSnapshot["surface"];
   onOpenSurface: (surfaceId: string) => void;
+  onOpenBuildTask: (buildTaskId: string) => void;
   onRepositionElement: (elementId: string, x: number, y: number) => Promise<string | undefined>;
   onResizeElement: (elementId: string, width: number, height: number) => Promise<string | undefined>;
   onAddTimePanel: () => Promise<string | undefined>;
@@ -270,6 +277,7 @@ export function SurfaceView({ revision, surface, onOpenSurface, onRepositionElem
             selected={editing && selectedElementId === element.id}
             previewPosition={drag?.element.id === element.id ? { x: drag.x, y: drag.y } : undefined}
             onOpenSurface={onOpenSurface}
+            onOpenBuildTask={onOpenBuildTask}
             onPointerDown={beginDrag}
             onPointerMove={previewDrag}
             onPointerUp={finishDrag}

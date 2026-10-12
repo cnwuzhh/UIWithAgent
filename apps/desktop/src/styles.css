@@ -15,8 +15,8 @@ button { font: inherit; }
 .brand, .system-state { display: flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 700; }
 .system-state { color: #c9cec5; font-family: "Ubuntu Mono", monospace; font-size: 11px; font-weight: 400; }
 .system-state span { width: 7px; height: 7px; border-radius: 50%; background: #83c97b; box-shadow: 0 0 0 3px #83c97b22; }
-.fullscreen-toggle { width: 30px; height: 30px; display: grid; place-items: center; padding: 0; border: 1px solid #646960; color: #f8f7f2; background: transparent; cursor: pointer; }
-.fullscreen-toggle:hover, .fullscreen-toggle:focus-visible { border-color: #e4b657; color: #e4b657; outline: none; }
+.titlebar-icon-button { width: 30px; height: 30px; display: grid; place-items: center; padding: 0; border: 1px solid #646960; color: #f8f7f2; background: transparent; cursor: pointer; }
+.titlebar-icon-button:hover, .titlebar-icon-button:focus-visible { border-color: #e4b657; color: #e4b657; outline: none; }
 .breadcrumb { display: flex; align-items: center; gap: 4px; padding: 0 24px; border-bottom: 1px solid #cac8bf; background: #f4f2ec; }
 .breadcrumb-item { display: flex; align-items: center; gap: 4px; padding: 6px 4px; border: 0; color: inherit; background: transparent; font-size: 13px; font-weight: 600; cursor: pointer; }
 .breadcrumb-item:hover, .breadcrumb-item:focus-visible { color: #2f6f62; outline: none; }
@@ -72,13 +72,13 @@ h1 { margin: 5px 0 0; font-size: 28px; letter-spacing: 0; }
 .navigator { margin: 0 30px 24px; height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border: 1px solid #aaa99f; background: #fdfcf8; color: #686c65; font-size: 12px; }
 .navigator kbd { margin-left: auto; font-family: "Ubuntu Mono", monospace; font-size: 10px; }
 .agent-dock { position: fixed; right: 24px; bottom: 20px; left: 24px; z-index: 10; height: 62px; display: flex; align-items: center; gap: 12px; padding: 0 12px; color: #f7f5ef; background: #2e322d; box-shadow: 0 9px 24px #17191433; }
-.agent-dock.expanded { min-height: 196px; height: auto; align-items: flex-start; padding-top: 14px; padding-bottom: 14px; }
+.agent-dock.expanded { max-height: calc(100vh - 40px); min-height: 196px; height: auto; align-items: flex-start; padding-top: 14px; padding-bottom: 14px; overflow-y: auto; }
 .agent-mark { width: 40px; height: 40px; display: grid; place-items: center; color: #20231f; background: #e4b657; }
 .agent-copy { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .agent-dock strong { font-size: 12px; }
 .agent-dock span { color: #b9beb5; font-size: 11px; }
 .builder-toggle, .agent-builder-form button { margin-left: auto; display: flex; align-items: center; justify-content: center; gap: 7px; height: 36px; padding: 0 15px; border: 1px solid #f0eee6; color: #f0eee6; background: transparent; white-space: nowrap; cursor: pointer; }
-.agent-builder-form { max-width: 760px; margin-top: 13px; display: grid; grid-template-columns: 1fr; gap: 6px; }
+.agent-builder-form { max-width: 920px; margin-top: 13px; display: grid; grid-template-columns: 1fr; gap: 6px; }
 .agent-builder-form label { font-size: 11px; font-weight: 700; }
 .agent-builder-form textarea { width: 100%; resize: vertical; min-height: 58px; padding: 9px 10px; border: 1px solid #777c74; border-radius: 0; color: #20231f; background: #f7f5ef; font: 12px/1.5 "Ubuntu", "Noto Sans", sans-serif; }
 .agent-builder-form textarea:focus { border-color: #e4b657; outline: 2px solid #e4b65755; }
@@ -86,6 +86,133 @@ h1 { margin: 5px 0 0; font-size: 28px; letter-spacing: 0; }
 .agent-builder-status .agent-reply { display: flex; align-items: center; gap: 5px; color: #e4b657; font-weight: 700; }
 .agent-builder-status .agent-build-error { color: #ffb2a7; }
 .agent-builder-form button:disabled { color: #8e938b; border-color: #62665f; cursor: default; }
+.agent-request-progress { display: grid; grid-template-columns: 24px minmax(0, 1fr); align-items: center; gap: 9px; padding: 9px 11px; border-left: 3px solid #e4b657; color: #20231f; background: #f3e8c9; }
+.agent-request-progress > svg { color: #80600e; }
+.agent-request-progress div { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.agent-request-progress strong { font-size: 11px; }
+.agent-request-progress span { color: #68614f; font: 10px/1.45 "Ubuntu Mono", monospace; }
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.agent-plan { margin-top: 8px; border: 1px solid #777c74; color: #20231f; background: #f7f5ef; }
+.agent-plan > header { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 13px 15px; border-bottom: 1px solid #c8c5ba; }
+.agent-plan h2 { margin: 3px 0 0; font-size: 16px; }
+.agent-plan > header > span { display: flex; align-items: center; gap: 5px; color: #22665a; font-weight: 700; }
+.agent-plan-steps { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; counter-reset: plan-step; }
+.agent-plan-steps > li { position: relative; padding: 13px 15px 14px 52px; border-top: 1px solid #d6d3c9; counter-increment: plan-step; }
+.agent-plan-steps > li::before { position: absolute; top: 13px; left: 15px; width: 24px; height: 24px; display: grid; place-items: center; color: #f7f5ef; background: #2f6f62; content: counter(plan-step); font: 11px/1 "Ubuntu Mono", monospace; }
+.agent-plan-steps h3 { margin: 0; font-size: 12px; }
+.agent-plan-steps > li > p { margin: 5px 0 9px; color: #555b54; font-size: 12px; line-height: 1.55; }
+.agent-plan-steps dl { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 4px 8px; margin: 0; font-size: 11px; line-height: 1.5; }
+.agent-plan-steps dt { color: #74786f; font-family: "Ubuntu Mono", monospace; }
+.agent-plan-steps dd { margin: 0; overflow-wrap: anywhere; }
+.agent-plan-steps ul { margin: 0; padding-left: 16px; }
+.agent-plan-notes { padding: 11px 15px; border-top: 1px solid #d6d3c9; }
+.agent-plan-notes strong { font-size: 11px; }
+.agent-plan-notes p, .agent-plan-notes ul { margin: 5px 0 0; color: #555b54; font-size: 12px; line-height: 1.55; }
+.agent-plan-commands code { display: block; margin-top: 6px; padding: 7px 9px; color: #e8eee8; background: #30342f; font: 10px/1.5 "Ubuntu Mono", monospace; overflow-wrap: anywhere; }
+.agent-package-action { display: flex; align-items: center; gap: 12px; padding: 12px 15px; border-top: 1px solid #d6d3c9; }
+.agent-package-action button { flex: 0 0 auto; margin-left: 0; border-color: #2f6f62; color: #f7f5ef; background: #2f6f62; }
+.agent-package-action button:hover, .agent-package-action button:focus-visible { color: #20231f; background: #83c97b; outline: none; }
+.agent-package-action span { color: #686c65; font: 10px/1.45 "Ubuntu Mono", monospace; }
+.agent-package { margin: 0 15px 14px; border: 1px solid #a9aca4; background: #fffefa; }
+.agent-package > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border-bottom: 1px solid #d6d3c9; background: #edf7f2; }
+.agent-package h3 { margin: 3px 0 0; font-size: 13px; }
+.agent-package > header > span { display: flex; align-items: center; gap: 5px; color: #22665a; font-weight: 700; }
+.agent-package dl { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 6px 10px; margin: 0; padding: 10px 12px; border-bottom: 1px solid #d6d3c9; font-size: 11px; }
+.agent-package dt { color: #74786f; font-family: "Ubuntu Mono", monospace; }
+.agent-package dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }
+.agent-package-files { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1px; background: #d6d3c9; }
+.agent-package-files span { min-width: 0; display: flex; align-items: center; gap: 6px; padding: 7px 9px; color: #555b54; background: #f7f5ef; font: 10px/1.4 "Ubuntu Mono", monospace; overflow-wrap: anywhere; }
+.agent-package-files svg { flex: 0 0 auto; color: #bc5545; }
+.agent-build-action { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-top: 1px solid #d6d3c9; }
+.agent-build-action button { flex: 0 0 auto; margin-left: 0; border-color: #8a6817; color: #20231f; background: #e4b657; }
+.agent-build-action button:hover, .agent-build-action button:focus-visible { border-color: #20231f; background: #f0c96f; outline: none; }
+.agent-build-action span { color: #686c65; font: 10px/1.45 "Ubuntu Mono", monospace; }
+.agent-build-result { display: grid; gap: 4px; margin: 0; padding: 10px 12px; border-top: 1px solid #b7d4c9; color: #245c52; background: #edf7f2; font-size: 11px; }
+.agent-build-result span { color: #49756c; }
+.agent-build-result code { overflow-wrap: anywhere; font: 10px/1.45 "Ubuntu Mono", monospace; }
+.agent-build-result.error { border-color: #e0b4ae; color: #7f3026; background: #fff7f2; line-height: 1.5; }
+.agent-plan footer { padding: 9px 15px; color: #686c65; background: #eeece5; font: 10px/1.5 "Ubuntu Mono", monospace; }
+.task-dialog-backdrop { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 24px; background: #17191499; }
+.task-dialog { width: min(560px, 100%); max-height: calc(100vh - 48px); overflow: auto; border: 1px solid #858980; background: #f7f5ef; box-shadow: 8px 8px 0 #20231f55; }
+.task-dialog > header { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 20px; border-bottom: 1px solid #c8c5ba; background: #eeece5; }
+.task-dialog h2 { margin: 4px 0 0; font-size: 20px; }
+.task-dialog-close { width: 34px; height: 34px; display: grid; flex: 0 0 auto; place-items: center; padding: 0; border: 1px solid #8f928a; color: #30342f; background: transparent; cursor: pointer; }
+.task-dialog-close:hover, .task-dialog-close:focus-visible { border-color: #a33f32; color: #a33f32; outline: none; }
+.task-dialog-content { display: grid; gap: 18px; padding: 20px; }
+.task-dialog-content > div > span { display: block; margin-bottom: 6px; color: #74786f; font-family: "Ubuntu Mono", monospace; font-size: 10px; text-transform: uppercase; }
+.task-dialog-content p { margin: 0; padding: 12px 14px; border-left: 3px solid #d5a33f; background: #fffefa; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+.task-status { display: flex; align-items: center; gap: 8px; color: #725716; }
+.task-status strong { font-size: 13px; }
+.task-status span { margin: 0 0 0 auto !important; color: #74786f; text-transform: none !important; }
+.task-dialog-content dl { display: grid; grid-template-columns: 96px 1fr; gap: 8px 12px; margin: 0; padding-top: 14px; border-top: 1px solid #d6d3c9; font-size: 11px; }
+.task-dialog-content dt { color: #74786f; }
+.task-dialog-content dd { margin: 0; font-family: "Ubuntu Mono", monospace; overflow-wrap: anywhere; }
+.task-dialog-error { margin: 20px; padding: 12px; border-left: 3px solid #a33f32; color: #7f3026; background: #fff7f2; font-size: 12px; }
+.toolbox-dialog-backdrop { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 24px; background: #171914b8; }
+.toolbox-dialog { width: min(1080px, 100%); height: min(760px, calc(100vh - 48px)); display: grid; grid-template-rows: 72px 1fr; overflow: hidden; border: 1px solid #858980; color: #20231f; background: #f7f5ef; box-shadow: 9px 9px 0 #11130f66; }
+.toolbox-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 20px; border-bottom: 1px solid #aaa99f; background: #e8e6de; }
+.toolbox-dialog-heading { display: flex; align-items: center; gap: 12px; }
+.toolbox-dialog-heading h2 { margin: 4px 0 0; font-size: 20px; }
+.toolbox-dialog-mark { width: 38px; height: 38px; display: grid; place-items: center; color: #f8f7f2; background: #2f6f62; box-shadow: 3px 3px 0 #194c43; }
+.toolbox-dialog-actions { display: flex; gap: 7px; }
+.toolbox-dialog-actions button { width: 34px; height: 34px; display: grid; place-items: center; padding: 0; border: 1px solid #8f928a; color: #30342f; background: #f7f5ef; cursor: pointer; }
+.toolbox-dialog-actions button:hover, .toolbox-dialog-actions button:focus-visible { border-color: #2f6f62; color: #2f6f62; outline: none; }
+.toolbox-dialog-actions button:last-child:hover, .toolbox-dialog-actions button:last-child:focus-visible { border-color: #a33f32; color: #a33f32; }
+.toolbox-dialog-actions button:disabled { color: #9a9d95; cursor: default; }
+.toolbox-dialog-state { display: grid; place-content: center; gap: 7px; color: #686c65; font: 12px/1.5 "Ubuntu Mono", monospace; text-align: center; }
+.toolbox-dialog-state.error { color: #7f3026; }
+.toolbox-dialog-state strong { font-family: "Ubuntu", "Noto Sans", sans-serif; font-size: 14px; }
+.toolbox-debug-layout { min-height: 0; display: grid; grid-template-columns: 310px minmax(0, 1fr); grid-template-rows: 74px minmax(0, 1fr) 210px; overflow: hidden; }
+.toolbox-summary { grid-column: 1 / -1; display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); border-bottom: 1px solid #c8c5ba; background: #fdfcf8; }
+.toolbox-summary > div { min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 18px; border-right: 1px solid #d6d3c9; }
+.toolbox-summary > div:last-of-type { border-right: 0; }
+.toolbox-summary span { color: #74786f; font: 10px/1 "Ubuntu Mono", monospace; text-transform: uppercase; }
+.toolbox-summary strong { font: 18px/1.2 "Ubuntu Mono", monospace; overflow-wrap: anywhere; }
+.toolbox-summary > div:first-child strong { color: #22665a; font-size: 14px; }
+.toolbox-summary p { grid-column: 1 / -1; margin: 0; padding: 5px 18px; color: #7f3026; background: #fff7f2; font-size: 11px; }
+.toolbox-element-index { min-height: 0; display: grid; grid-template-rows: 46px 1fr; border-right: 1px solid #c8c5ba; background: #eeece5; }
+.toolbox-filter { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; padding: 8px; border-bottom: 1px solid #c8c5ba; background: #dad8cf; }
+.toolbox-filter button { min-width: 0; padding: 0 5px; border: 0; color: #555a52; background: #f7f5ef; font-size: 10px; cursor: pointer; }
+.toolbox-filter button:hover, .toolbox-filter button:focus-visible { color: #22665a; outline: 1px solid #2f6f62; }
+.toolbox-filter button.active { color: #f7f5ef; background: #2f6f62; }
+.toolbox-element-list { min-height: 0; overflow-y: auto; }
+.toolbox-element-list > button { width: 100%; min-height: 58px; display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 8px 10px; border: 0; border-bottom: 1px solid #d6d3c9; color: #30342f; background: transparent; text-align: left; cursor: pointer; }
+.toolbox-element-list > button:hover, .toolbox-element-list > button:focus-visible { background: #f7f5ef; outline: none; }
+.toolbox-element-list > button.selected { box-shadow: inset 4px 0 #d5a33f; background: #fdfcf8; }
+.toolbox-element-list button > span { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.toolbox-element-list strong { font-size: 12px; }
+.toolbox-element-list code, .toolbox-element-detail code, .toolbox-recipes code { color: #686c65; font: 10px/1.3 "Ubuntu Mono", monospace; overflow-wrap: anywhere; }
+.toolbox-element-list i { padding: 3px 5px; border: 1px solid currentColor; font: normal 8px/1 "Ubuntu Mono", monospace; text-transform: uppercase; }
+.toolbox-element-list i.available { color: #22665a; }
+.toolbox-element-list i.preview { color: #8a6817; }
+.toolbox-element-detail { min-width: 0; min-height: 0; overflow-y: auto; padding: 20px 24px; background-color: #f7f5ef; background-image: linear-gradient(#d8d5ca44 1px, transparent 1px), linear-gradient(90deg, #d8d5ca44 1px, transparent 1px); background-size: 20px 20px; }
+.toolbox-element-detail > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding-bottom: 15px; border-bottom: 1px solid #c8c5ba; }
+.toolbox-element-detail h3 { margin: 4px 0 3px; font-size: 21px; }
+.toolbox-availability { display: flex; align-items: center; gap: 5px; padding: 6px 8px; border: 1px solid currentColor; font: 10px/1 "Ubuntu Mono", monospace; text-transform: uppercase; }
+.toolbox-availability.available { color: #22665a; background: #edf7f2; }
+.toolbox-availability.preview { color: #80600e; background: #fff7df; }
+.toolbox-description { margin: 16px 0; color: #555b54; font-size: 13px; line-height: 1.6; }
+.toolbox-facts { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 0; margin: 0; border-top: 1px solid #c8c5ba; border-left: 1px solid #c8c5ba; background: #fdfcf8; font-size: 11px; }
+.toolbox-facts dt, .toolbox-facts dd { margin: 0; padding: 8px 10px; border-right: 1px solid #c8c5ba; border-bottom: 1px solid #c8c5ba; }
+.toolbox-facts dt { color: #686c65; font-family: "Ubuntu Mono", monospace; }
+.toolbox-facts dd { overflow-wrap: anywhere; }
+.toolbox-config { margin-top: 18px; }
+.toolbox-config h4 { display: flex; justify-content: space-between; margin: 0 0 8px; font-size: 12px; }
+.toolbox-config h4 span { color: #74786f; font: 10px "Ubuntu Mono", monospace; }
+.toolbox-config table { width: 100%; border-collapse: collapse; background: #fdfcf8; font-size: 10px; }
+.toolbox-config th, .toolbox-config td { padding: 8px 9px; border: 1px solid #c8c5ba; text-align: left; }
+.toolbox-config th { color: #686c65; background: #eeece5; font-family: "Ubuntu Mono", monospace; font-weight: 400; }
+.toolbox-config p, .toolbox-empty { margin: 0; padding: 14px; border-left: 3px solid #d5a33f; color: #686c65; background: #fffefa; font-size: 11px; }
+.toolbox-recipes { grid-column: 1 / -1; min-height: 0; display: grid; grid-template-rows: 49px 1fr; border-top: 1px solid #aaa99f; background: #e8e6de; }
+.toolbox-recipes > header { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
+.toolbox-recipes h3 { margin: 2px 0 0; font-size: 14px; }
+.toolbox-recipes > header > span { color: #686c65; font: 10px "Ubuntu Mono", monospace; }
+.toolbox-recipe-grid { min-height: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(220px, 1fr); gap: 9px; padding: 0 12px 12px; overflow-x: auto; }
+.toolbox-recipe-grid article { min-width: 0; padding: 11px 12px; border: 1px solid #c0beb4; border-left: 3px solid #bc5545; background: #fdfcf8; }
+.toolbox-recipe-grid strong, .toolbox-recipe-grid code { display: block; }
+.toolbox-recipe-grid strong { margin-bottom: 3px; font-size: 11px; }
+.toolbox-recipe-grid p { margin: 7px 0 0; color: #686c65; font: 9px/1.35 "Ubuntu Mono", monospace; overflow-wrap: anywhere; }
 .status-page { display: grid; place-items: center; font-family: "Ubuntu Mono", monospace; color: #686c65; }
 .status-page.error { color: #9d392e; }
 
@@ -104,4 +231,21 @@ h1 { margin: 5px 0 0; font-size: 28px; letter-spacing: 0; }
   .agent-builder-form { grid-column: 1 / -1; }
   .agent-builder-status { align-items: stretch; flex-direction: column; }
   .agent-builder-form button { width: 100%; }
+  .agent-package-action { align-items: stretch; flex-direction: column; }
+  .agent-package-action button { width: 100%; }
+  .agent-build-action { align-items: stretch; flex-direction: column; }
+  .agent-build-action button { width: 100%; }
+  .task-dialog-backdrop { place-items: end center; padding: 12px; }
+  .task-dialog { max-height: calc(100vh - 24px); }
+  .task-dialog-content dl { grid-template-columns: 78px 1fr; }
+  .toolbox-dialog-backdrop { align-items: stretch; padding: 10px; }
+  .toolbox-dialog { height: calc(100vh - 20px); }
+  .toolbox-debug-layout { grid-template-columns: 1fr; grid-template-rows: 92px 220px minmax(260px, 1fr) 220px; overflow-y: auto; }
+  .toolbox-summary { grid-column: 1; grid-template-columns: repeat(3, 1fr); }
+  .toolbox-summary > div { padding: 0 10px; }
+  .toolbox-summary > div:first-child { grid-column: 1 / -1; min-height: 38px; border-right: 0; border-bottom: 1px solid #d6d3c9; }
+  .toolbox-summary > div:first-child strong { font-size: 12px; }
+  .toolbox-element-index { border-right: 0; border-bottom: 1px solid #c8c5ba; }
+  .toolbox-element-detail { overflow: visible; }
+  .toolbox-recipes { grid-column: 1; }
 }

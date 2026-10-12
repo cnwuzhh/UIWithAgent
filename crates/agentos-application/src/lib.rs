@@ -1,12 +1,25 @@
 use agentos_contracts::{
-    BreadcrumbItemDto, BuildSubmissionDto, ElementDto, GridRectDto, RuntimeSnapshotDto, SurfaceDto,
-    TextRunDto,
+    AgentPlanDto, BreadcrumbItemDto, BuildSubmissionDto, BuildTaskDto, ElementDto, GridRectDto,
+    RuntimeSnapshotDto, SurfaceDto, TextRunDto,
 };
 use agentos_domain::{
     AppIcon, AppIconStatus, Element, GridRect, GuiDocument, GuiOperation, OperationTransaction,
     Surface, SurfaceId, TextPanel, TextRun, TimePanel,
 };
+use agentos_toolbox::{BuiltInToolboxCatalog, ToolboxCatalog, ToolboxDescriptor};
 use std::collections::HashMap;
+
+#[derive(Debug)]
+pub struct AgentPlanningRequest {
+    pub request: String,
+    pub snapshot: RuntimeSnapshotDto,
+    pub toolbox: ToolboxDescriptor,
+}
+
+#[async_trait::async_trait]
+pub trait PlanningAgent: Send + Sync {
+    async fn plan(&self, request: AgentPlanningRequest) -> Result<AgentPlanDto, String>;
+}
 
 #[derive(Clone, Debug)]
 pub struct BuildTask {
@@ -107,6 +120,30 @@ impl Runtime {
     pub fn snapshot(&self) -> RuntimeSnapshotDto {
         self.snapshot_for(&self.current_surface_id)
             .expect("current surface must exist")
+    }
+
+    pub fn toolbox_descriptor(&self) -> ToolboxDescriptor {
+        BuiltInToolboxCatalog.descriptor()
+    }
+
+    pub fn planning_request(
+        &self,
+        surface_id: &str,
+        request: &str,
+    ) -> Result<AgentPlanningRequest, String> {
+        let request = request.trim();
+        if request.is_empty() {
+            return Err("planning request cannot be empty".into());
+        }
+        let surface_id = SurfaceId::new(surface_id).map_err(|error| error.to_string())?;
+        if surface_id != self.current_surface_id {
+            return Err("planning request surface must be the current surface".into());
+        }
+        Ok(AgentPlanningRequest {
+            request: request.into(),
+            snapshot: self.snapshot_for(&surface_id)?,
+            toolbox: self.toolbox_descriptor(),
+        })
     }
 
     pub fn open_surface(&mut self, surface_id: &str) -> Result<RuntimeSnapshotDto, String> {
@@ -257,6 +294,21 @@ impl Runtime {
         })
     }
 
+    pub fn build_task(&self, build_task_id: &str) -> Result<BuildTaskDto, String> {
+        let task = self
+            .build_tasks
+            .get(build_task_id)
+            .ok_or_else(|| format!("build task not found: {build_task_id}"))?;
+        Ok(BuildTaskDto {
+            id: task.id.clone(),
+            surface_id: task.surface_id.as_str().into(),
+            request: task.request.clone(),
+            status: "building".into(),
+            agent_message: "收到".into(),
+            placeholder_element_id: task.placeholder_element_id.clone(),
+        })
+    }
+
     fn snapshot_for(&self, surface_id: &SurfaceId) -> Result<RuntimeSnapshotDto, String> {
         let surface = self
             .document
@@ -370,6 +422,7 @@ fn rect_to_dto(rect: GridRect) -> GridRectDto {
 #[cfg(test)]
 mod tests {
     use super::Runtime;
+    use agentos_toolbox::ElementAvailability;
 
     #[test]
     fn initial_snapshot_has_three_clocks() {
@@ -383,6 +436,17 @@ mod tests {
 
         assert_eq!(clock_count, 3);
         assert_eq!(snapshot.revision, 1);
+    }
+
+    #[test]
+    fn toolbox_descriptor_is_read_only_and_versioned() {
+        let runtime = Runtime::demo();
+        let descriptor = runtime.toolbox_descriptor();
+
+        assert_eq!(descriptor.version, "2026-10-08.1");
+        assert_eq!(descriptor.elements.len(), 11);
+        assert_eq!(descriptor.recipes.len(), 7);
+        assert_eq!(runtime.snapshot().revision, 1);
     }
 
     #[test]
@@ -580,5 +644,55 @@ mod tests {
         );
         assert_eq!(runtime.snapshot().revision, 2);
         assert_eq!(runtime.build_tasks.len(), 1);
+    }
+
+    #[test]
+    fn build_task_details_are_read_only_and_unknown_ids_fail() {
+        let mut runtime = Runtime::demo();
+        runtime
+            .submit_build("surface-desktop", "创建天气应用")
+            .unwrap();
+
+        let task = runtime.build_task("build-1").unwrap();
+        assert_eq!(task.id, "build-1");
+        assert_eq!(task.surface_id, "surface-desktop");
+        assert_eq!(task.request, "创建天气应用");
+        assert_eq!(task.status, "building");
+        assert_eq!(task.agent_message, "收到");
+        assert_eq!(task.placeholder_element_id, "build-placeholder-1");
+        assert_eq!(runtime.snapshot().revision, 2);
+        assert!(runtime.build_task("missing").is_err());
+        assert_eq!(runtime.snapshot().revision, 2);
+    }
+
+    #[test]
+    fn planning_context_is_read_only_and_scoped_to_current_surface() {
+        let runtime = Runtime::demo();
+
+        let request = runtime
+            .planning_request("surface-desktop", "  增加当地天气  ")
+            .unwrap();
+        assert_eq!(request.request, "增加当地天气");
+        assert_eq!(request.snapshot.current_surface_id, "surface-desktop");
+        assert_eq!(request.snapshot.revision, 1);
+        assert_eq!(request.toolbox.version, "2026-10-08.1");
+        assert_eq!(request.toolbox.recipes.len(), 7);
+        assert_eq!(
+            request
+                .toolbox
+                .elements
+                .iter()
+                .filter(|element| element.availability == ElementAvailability::Available)
+                .count(),
+            3
+        );
+        assert_eq!(runtime.snapshot().revision, 1);
+        assert!(
+            runtime
+                .planning_request("surface-work", "增加天气")
+                .is_err()
+        );
+        assert!(runtime.planning_request("surface-desktop", "  ").is_err());
+        assert_eq!(runtime.snapshot().revision, 1);
     }
 }

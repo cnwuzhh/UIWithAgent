@@ -2,9 +2,13 @@
 resolver = "2"
 members = [
   "apps/desktop/src-tauri",
+  "crates/agentos-agent-ledger",
   "crates/agentos-application",
   "crates/agentos-contracts",
   "crates/agentos-domain",
+  "crates/agentos-generated-app-runtime",
+  "crates/agentos-model-openai-compatible",
+  "crates/agentos-toolbox",
 ]
 
 [workspace.package]
@@ -14,10 +18,21 @@ rust-version = "1.85"
 version = "0.1.0"
 
 [workspace.dependencies]
+agentos-agent-ledger = { path = "crates/agentos-agent-ledger" }
 agentos-application = { path = "crates/agentos-application" }
 agentos-contracts = { path = "crates/agentos-contracts" }
 agentos-domain = { path = "crates/agentos-domain" }
+agentos-generated-app-runtime = { path = "crates/agentos-generated-app-runtime" }
+agentos-model-openai-compatible = { path = "crates/agentos-model-openai-compatible" }
+agentos-toolbox = { path = "crates/agentos-toolbox" }
+async-trait = "0.1"
+futures-lite = "2"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+rusqlite = { version = "0.32", features = ["bundled"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+sha2 = "0.10"
 tauri = { version = "2", default-features = false, features = ["wry"] }
 tauri-build = { version = "2" }
+tempfile = "3"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }

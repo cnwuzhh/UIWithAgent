@@ -1,0 +1,22 @@
+[package]
+name = "agentos-model-openai-compatible"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+agentos-agent-ledger.workspace = true
+agentos-application.workspace = true
+agentos-contracts.workspace = true
+agentos-generated-app-runtime.workspace = true
+agentos-toolbox.workspace = true
+async-trait.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio = { workspace = true, features = ["time"] }
+
+[dev-dependencies]
+futures-lite.workspace = true
+tokio.workspace = true

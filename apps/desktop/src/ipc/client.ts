@@ -1,9 +1,14 @@
 import { invoke } from "@tauri-apps/api/core";
-import { buildSubmissionSchema, runtimeSnapshotSchema, type BuildSubmission, type RuntimeSnapshot } from "../contracts";
+import { agentBuildResultSchema, buildSubmissionSchema, buildTaskSchema, generatedAppPackageSchema, reviewedAgentPlanSchema, runtimeSnapshotSchema, toolboxDescriptorSchema, type AgentBuildResult, type BuildSubmission, type BuildTask, type GeneratedAppPackage, type ReviewedAgentPlan, type RuntimeSnapshot, type ToolboxDescriptor } from "../contracts";
 
 export async function getRuntimeSnapshot(): Promise<RuntimeSnapshot> {
   const response = await invoke<unknown>("get_runtime_snapshot");
   return runtimeSnapshotSchema.parse(response);
+}
+
+export async function getToolboxDescriptor(): Promise<ToolboxDescriptor> {
+  const response = await invoke<unknown>("get_toolbox_descriptor");
+  return toolboxDescriptorSchema.parse(response);
 }
 
 export async function openSurface(surfaceId: string): Promise<RuntimeSnapshot> {
@@ -48,6 +53,26 @@ export async function removeElement(surfaceId: string, elementId: string): Promi
 export async function submitBuild(surfaceId: string, request: string): Promise<BuildSubmission> {
   const response = await invoke<unknown>("submit_build", { surfaceId, request });
   return buildSubmissionSchema.parse(response);
+}
+
+export async function getBuildTask(buildTaskId: string): Promise<BuildTask> {
+  const response = await invoke<unknown>("get_build_task", { buildTaskId });
+  return buildTaskSchema.parse(response);
+}
+
+export async function planAgent(surfaceId: string, request: string): Promise<ReviewedAgentPlan> {
+  const response = await invoke<unknown>("plan_agent", { surfaceId, request });
+  return reviewedAgentPlanSchema.parse(response);
+}
+
+export async function generateAgentPackage(planId: string): Promise<GeneratedAppPackage> {
+  const response = await invoke<unknown>("generate_agent_package", { planId });
+  return generatedAppPackageSchema.parse(response);
+}
+
+export async function buildAgentPackage(planId: string): Promise<AgentBuildResult> {
+  const response = await invoke<unknown>("build_agent_package", { planId });
+  return agentBuildResultSchema.parse(response);
 }
 
 export async function toggleFullscreen(): Promise<boolean> {

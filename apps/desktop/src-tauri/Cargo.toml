@@ -13,6 +13,11 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build.workspace = true
 
 [dependencies]
+agentos-agent-ledger.workspace = true
 agentos-application.workspace = true
 agentos-contracts.workspace = true
+agentos-generated-app-runtime.workspace = true
+agentos-model-openai-compatible.workspace = true
+agentos-toolbox.workspace = true
+serde.workspace = true
 tauri.workspace = true

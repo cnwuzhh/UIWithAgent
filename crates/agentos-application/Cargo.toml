@@ -8,3 +8,5 @@ version.workspace = true
 [dependencies]
 agentos-contracts.workspace = true
 agentos-domain.workspace = true
+agentos-toolbox.workspace = true
+async-trait.workspace = true

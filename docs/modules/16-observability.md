@@ -9,7 +9,7 @@
 
 ## 非目标
 
-不作为审计记录的唯一存储、不记录完整用户内容/模型提示/Secret、不依赖特定云监控供应商。
+不作为 Agent 行为审计的权威存储、不记录完整用户内容/模型提示/Secret、不依赖特定云监控供应商。完整对话、代码和行为由 [Agent Ledger](20-agent-ledger.md) 保存。
 
 ## 关联标识
 
@@ -45,7 +45,7 @@ event name 使用稳定命名，例如 `operation.commit.succeeded`，不把动�
 - 开发：pretty console + file JSON。
 - 生产：滚动 JSONL 文件，默认 info，按大小/日期轮转。
 - 用户诊断模式：短期提高指定 component 日志级别，自动过期。
-- audit：由 Repository 写不可变业务审计，本模块只关联 audit ID。
+- audit：由 Repository 写不可变业务审计，Agent 行为由 Agent Ledger 追加记录；本模块只关联 audit ID 和 ledger event ID。
 
 ## 脱敏
 

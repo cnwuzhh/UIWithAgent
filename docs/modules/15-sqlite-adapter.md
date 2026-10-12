@@ -37,9 +37,15 @@ LocalApps(...)
 ExternalAppSessions(...)
 Settings(...)
 AuditRecords(...)
+AgentLedgerStreams(...)
+AgentLedgerEvents(...)
+AgentLedgerArtifacts(...)
+AgentLedgerEventArtifacts(...)
 ```
 
 实际命名统一 snake_case。父子关系和引用使用 foreign key；开放 Element payload 使用 versioned JSON。
+
+`AgentLedgerEvents` 与 Artifact immutable，只允许 append/read/verify。Agent Ledger 的 sequence 与 hash chain 约束、内容寻址 Artifact 和删除策略见 [Agent Ledger](20-agent-ledger.md)。
 
 ## 映射
 
