@@ -66,7 +66,7 @@ const GENERATED_APP_RUNTIME_PROMPT: &str = r#"Authoritative Generated App Runtim
 - If an available Element lacks a suitable dynamic data adapter, name the required Host binding adapter as an implementation dependency. Do not work around it by writing Surface files.
 - Generated packages do not implement or register Host adapters. A correctly declared blocked Host adapter or Element capability remains an external dependency and is not a generated-package defect.
 - Surface creation is not currently exposed in the supplied capabilities. Plan placement on the current Surface unless the plan explicitly marks a new-Surface Host operation as a missing dependency."#;
-const CRITIC_PROMPT: &str = r#"Review the candidate plan as a strict senior implementation reviewer. Return exactly JSON: {"ready":boolean,"issues":[{"area":"string","problem":"string","requiredChange":"string"}]}. Mark ready true only when an engineer can implement without inventing missing architecture. Check: every requested recurring/event-driven behavior has a concrete trigger owner and configuration, with missing scheduler/event Host support declared as a blocking dependency; every default external source has a pre-build status/content-type/parseability probe that fails the build when no live default source is usable; credential and usage-policy assumptions are honest; API endpoint defaults, explicit query parameters, pagination, truncation diagnostics, and heterogeneous record types cannot silently corrupt results; every aggregate metric is computed from a dataset complete for that metric rather than a time-filtered subset; business metrics use authoritative source fields rather than convenient proxies; imported records use a stable semantic identity that deduplicates overlapping exports rather than including the import filename or row position; when an authoritative transaction ID is absent, deduplication preserves legitimate repeated transactions with identical date, description, amount, and currency by using occurrence-aware overlap matching or an equally collision-safe strategy instead of collapsing a weak composite hash; financial plans distinguish purchases, income, refunds, reversals, internal transfers, and credit-card repayments, and detect, preserve, convert, or explicitly reject currencies instead of silently assigning one currency; partial row/file failures visibly mark affected aggregates incomplete rather than publishing them as complete; supported encodings, delimiters, quoting, locale-specific dates, and amount formats match the promised import scope; test fixtures and sample data are never used as production fallback, while persisted prior live data is explicitly marked stale/truncated; incremental comparison loads and retains prior state before atomically replacing it only after successful computation; local file or folder inputs have an explicit user-authorized Host selection/mount contract rather than assuming unrestricted paths; a requested knowledge base defines durable incremental indexing, changed-file replacement, deleted-file propagation, and index/model version compatibility, or honestly declares a one-shot limitation that still satisfies the request; document ingestion handles or explicitly rejects scanned/empty/encrypted PDFs and unsupported encodings; citations map to stable coordinates in the original source, including page ranges for cross-page PDF chunks and source offsets or line ranges for Markdown, rather than offsets in transformed text; question answering provides the requested query-input path and refuses unsupported answers when retrieval evidence is insufficient; runtime/module/dependency versions are compatible and every build/test/run command executes the named source or compiled files as written; exact package/file responsibilities; normalized record fields and exact JSONL envelopes, using only recordBatch/state/diagnostic and expressing fatal failure as error diagnostic plus state(status=error); retries/timeouts/rate limits/deduplication; generated code only emits protocol output and never writes Surface/config/database; Host UI binding names an available typeId and exact config shape plus any missing adapter; proposed rect dimensions exactly match the requested Element size, respect the Toolbox defaultSize, and placement is delegated to the Host/Placement Engine or proven collision-free; observable tests and failure cases; no unsupported Runtime capability; no false offline claims. Do not reject arbitrary generated code merely because a domain-specific Toolbox element is preview."#;
+const CRITIC_PROMPT: &str = r#"Review the candidate plan as a strict senior implementation reviewer. Return exactly JSON: {"ready":boolean,"issues":[{"area":"string","problem":"string","requiredChange":"string"}]}. Mark ready true when the generated package can be implemented without inventing missing package architecture. Readiness covers the generated package, not completion of separately owned Host capabilities. A missing Host adapter, scheduler, Element capability, or Surface operation is not a plan defect when the plan names its exact contract, marks the affected integration blocked, does not claim the external capability exists, and keeps generated code from implementing or bypassing it. Do not repeatedly demand implementation of such a correctly declared Host-owned dependency; return ready true when no generated-package issue remains. Check: every requested recurring/event-driven behavior has a concrete trigger owner and configuration, with missing scheduler/event Host support declared as a blocking dependency; every default external source has a pre-build status/content-type/parseability probe that fails the build when no live default source is usable; credential and usage-policy assumptions are honest; API endpoint defaults, explicit query parameters, pagination, truncation diagnostics, and heterogeneous record types cannot silently corrupt results; every aggregate metric is computed from a dataset complete for that metric rather than a time-filtered subset; business metrics use authoritative source fields rather than convenient proxies; imported records use a stable semantic identity that deduplicates overlapping exports rather than including the import filename or row position; when an authoritative transaction ID is absent, deduplication preserves legitimate repeated transactions with identical date, description, amount, and currency by using occurrence-aware overlap matching or an equally collision-safe strategy instead of collapsing a weak composite hash; financial plans distinguish purchases, income, refunds, reversals, internal transfers, and credit-card repayments, and detect, preserve, convert, or explicitly reject currencies instead of silently assigning one currency; partial row/file failures visibly mark affected aggregates incomplete rather than publishing them as complete; supported encodings, delimiters, quoting, locale-specific dates, and amount formats match the promised import scope; test fixtures and sample data are never used as production fallback, while persisted prior live data is explicitly marked stale/truncated; incremental comparison loads and retains prior state before atomically replacing it only after successful computation; local file or folder inputs have an explicit user-authorized Host selection/mount contract rather than assuming unrestricted paths; a requested knowledge base defines durable incremental indexing, changed-file replacement, deleted-file propagation, and index/model version compatibility, or honestly declares a one-shot limitation that still satisfies the request; document ingestion handles or explicitly rejects scanned/empty/encrypted PDFs and unsupported encodings; citations map to stable coordinates in the original source, including page ranges for cross-page PDF chunks and source offsets or line ranges for Markdown, rather than offsets in transformed text; question answering provides the requested query-input path and refuses unsupported answers when retrieval evidence is insufficient; runtime/module/dependency versions are compatible and every build/test/run command executes the named source or compiled files as written; exact package/file responsibilities; normalized record fields and exact JSONL envelopes, using only recordBatch/state/diagnostic and expressing fatal failure as error diagnostic plus state(status=error); retries/timeouts/rate limits/deduplication; generated code only emits protocol output and never writes Surface/config/database; Host UI binding names an available typeId and exact config shape plus any missing adapter; proposed rect dimensions exactly match the requested Element size, respect the Toolbox defaultSize, and placement is delegated to the Host/Placement Engine or proven collision-free; observable tests and failure cases; no unsupported Runtime capability; no false offline claims. Do not reject arbitrary generated code merely because a domain-specific Toolbox element is preview."#;
 const DERIVED_OUTPUT_CRITIC_PROMPT: &str = "Additional mandatory check: classification, analysis, ranking, summarization, and other complex derived outputs must come from a documented authoritative datasource or Provider capability. The Surface Agent must not plan a local derivation algorithm or model step for them. An explicitly documented datasource summary or abstract field is acceptable and does not require local summarization, word-frequency, or sentence-scoring. The data contract must name the upstream field and preserve its source provenance, normalization, and missing-field behavior. Reject plans that truncate or rename article body/description text as a summary, use an undocumented upstream field, silently fall back to local derivation, or claim implementation readiness while a required Provider capability is absent.";
 const BUILD_READINESS_REVIEW_PROMPT: &str = "Additional mandatory build-readiness checks: feed probes must accept standards-compatible XML media types including application/rss+xml, application/atom+xml, application/xml, and text/xml instead of rejecting valid feeds with a narrow allowlist. When the package promises or contains automated tests, buildCommands must explicitly execute every generated test suite after dependencies are installed; merely generating test files is not sufficient. The manifest object in the package response is the complete authoritative generated-app manifest and the Host materializes it as MANIFEST.json; never require MANIFEST.json, agentos-manifest.json, or any other manifest file in the generated files array.";
 const REVISION_PROMPT: &str = r#"Revise the candidate into the final implementation-ready plan. Resolve every critic issue and all directly related semantics consistently across architecture, dataContract, steps, deliverables, and verification. Preserve every constraint already resolved in the candidate; do not reintroduce prior issues or add unsupported guarantees. Preserve the required plan JSON schema exactly, with 4 to 8 steps and no more than 12 assumptions. Do not mention the review process. Do not invent Runtime capabilities; when an integration is planned but not implemented, name the exact contract the Generated App Runtime must provide."#;
@@ -1495,7 +1495,7 @@ mod tests {
     use serde_json::json;
     use std::collections::BTreeMap;
     use std::io::{Read, Write};
-    use std::net::TcpListener;
+    use std::net::{TcpListener, TcpStream};
     use std::sync::Arc;
     use std::thread;
 
@@ -1529,6 +1529,35 @@ mod tests {
             github_token: None,
             timeout: std::time::Duration::from_secs(10),
             ledger: Arc::new(agentos_agent_ledger::InMemoryAgentLedger::default()),
+        }
+    }
+
+    fn read_http_request(stream: &mut TcpStream) -> Vec<u8> {
+        let mut request = Vec::new();
+        let mut buffer = [0_u8; 4096];
+        loop {
+            let headers_end = request
+                .windows(4)
+                .position(|window| window == b"\r\n\r\n")
+                .map(|position| position + 4);
+            if let Some(headers_end) = headers_end {
+                let headers = String::from_utf8_lossy(&request[..headers_end]);
+                let content_length = headers
+                    .lines()
+                    .find_map(|line| {
+                        let (name, value) = line.split_once(':')?;
+                        name.eq_ignore_ascii_case("content-length")
+                            .then(|| value.trim().parse::<usize>().unwrap())
+                    })
+                    .unwrap();
+                if request.len() >= headers_end + content_length {
+                    return request;
+                }
+            }
+
+            let bytes_read = stream.read(&mut buffer).unwrap();
+            assert_ne!(bytes_read, 0, "provider request ended before its body");
+            request.extend_from_slice(&buffer[..bytes_read]);
         }
     }
 
@@ -1730,6 +1759,16 @@ mod tests {
     }
 
     #[test]
+    fn plan_critic_accepts_correctly_blocked_host_dependencies() {
+        assert!(CRITIC_PROMPT.contains("Readiness covers the generated package"));
+        assert!(CRITIC_PROMPT.contains("not a plan defect"));
+        assert!(CRITIC_PROMPT.contains("Do not repeatedly demand implementation"));
+        assert!(
+            CRITIC_PROMPT.contains("return ready true when no generated-package issue remains")
+        );
+    }
+
+    #[test]
     fn generated_python_commands_use_the_host_executable() {
         assert!(CODE_GENERATION_PROMPT.contains("Host Python executable is python3"));
         assert!(CODE_REVIEW_PROMPT.contains("reject python in manifest buildCommands"));
@@ -1877,6 +1916,112 @@ mod tests {
             String::from_utf8(failure)
                 .unwrap()
                 .contains("ServerOverloaded")
+        );
+    }
+
+    #[tokio::test]
+    async fn plans_successfully_after_mock_provider_approval() {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let address = listener.local_addr().unwrap();
+        let plan = json!({
+            "goal": "显示当地时间",
+            "approach": "生成一个独立应用，并用静态文本面板展示其说明。",
+            "architecture": ["App: 提供本地运行入口"],
+            "dataContract": "不读取外部数据；应用启动后展示静态说明。",
+            "buildCommands": ["python3 -m compileall ."],
+            "runCommand": "python3 main.py",
+            "steps": (1..=4).map(|index| json!({
+                "title": format!("实现阶段 {index}"),
+                "action": "建立指定模块并连接其输入和输出。",
+                "deliverables": [format!("src/module-{index}.py")],
+                "verification": "运行模块测试并检查进程退出状态。"
+            })).collect::<Vec<_>>(),
+            "uiBinding": {
+                "typeId": "text.panel",
+                "config": {"title": "Agent plan test", "runs": ["Static test panel"]},
+                "adapterId": null,
+                "status": "ready",
+                "notes": "只展示静态说明，不需要动态适配器。"
+            },
+            "impact": "生成独立应用，不修改当前 Surface。",
+            "assumptions": []
+        });
+        let responses = [
+            plan.to_string(),
+            json!({"ready": true, "issues": []}).to_string(),
+        ];
+        let server = thread::spawn(move || {
+            let mut requests = Vec::new();
+            for content in responses {
+                let (mut stream, _) = listener.accept().unwrap();
+                stream
+                    .set_read_timeout(Some(std::time::Duration::from_secs(10)))
+                    .unwrap();
+                let request = read_http_request(&mut stream);
+                let body_start = request
+                    .windows(4)
+                    .position(|window| window == b"\r\n\r\n")
+                    .unwrap()
+                    + 4;
+                requests.push(
+                    serde_json::from_slice::<serde_json::Value>(&request[body_start..]).unwrap(),
+                );
+
+                let response_body = json!({
+                    "choices": [{"message": {"content": content}}]
+                })
+                .to_string();
+                write!(
+                    stream,
+                    "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+                    response_body.len(),
+                    response_body
+                )
+                .unwrap();
+            }
+            requests
+        });
+        let ledger = Arc::new(agentos_agent_ledger::InMemoryAgentLedger::default());
+        let agent = OpenAiCompatiblePlanningAgent {
+            client: reqwest::Client::new(),
+            provider: ModelProvider::OpenAiCompatible,
+            base_url: format!("http://{address}"),
+            model: Some("test-model".into()),
+            api_key: Some("test-key".into()),
+            github_token: None,
+            timeout: std::time::Duration::from_secs(10),
+            ledger: ledger.clone(),
+        };
+        let request = Runtime::demo()
+            .planning_request("surface-desktop", "显示当地时间")
+            .unwrap();
+
+        let result = agent.plan(request).await.unwrap();
+        let requests = server.join().unwrap();
+
+        assert_eq!(result.mode, "planOnly");
+        assert_eq!(result.request, "显示当地时间");
+        assert_eq!(result.based_on_revision, 1);
+        assert_eq!(result.capabilities, ["surface.read", "toolbox.read"]);
+        assert_eq!(result.steps.len(), 4);
+        assert_eq!(requests.len(), 2);
+        assert_eq!(requests[0]["model"], "test-model");
+        let planning_messages = requests[0]["messages"].as_array().unwrap();
+        assert!(planning_messages.iter().any(|message| {
+            message["content"]
+                .as_str()
+                .is_some_and(|content| content.contains("PLAN_ONLY"))
+        }));
+        assert!(
+            requests[1]["messages"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|message| {
+                    message["content"]
+                        .as_str()
+                        .is_some_and(|content| content.contains("Review the candidate plan"))
+                })
         );
     }
 
